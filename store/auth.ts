@@ -1,4 +1,7 @@
 import { defineStore } from 'pinia';
+import type { UserSignInInterface } from '~/interfaces/UserSignInInterface';
+import { FetchError } from 'ofetch';
+import type { UserSignUpInterface } from '~/interfaces/UserSignUpInterface';
 
 export interface UserTokensInterface {
   accessToken: string;
@@ -26,6 +29,27 @@ export const useAuthStore = defineStore('auth', {
       const tokenRefreshCookie = useCookie('tokenRefresh');
       tokenCookie.value = accessToken;
       tokenRefreshCookie.value = refreshToken;
+    },
+    async authSign(
+      credentials: UserSignInInterface | UserSignUpInterface,
+      url: '/api/auth/sign-in' | '/api/auth/sign-up',
+    ) {
+      await $fetch(url, {
+        method: 'post',
+        body: credentials,
+      })
+        .then(res => {
+          if (res && typeof res === 'object') {
+            const { accessToken, refreshToken } = res as UserTokensInterface;
+            if (accessToken && refreshToken)
+              this.setAuthenticated({ accessToken, refreshToken });
+          }
+        })
+        .catch((err: FetchError) => {
+          throw err.data;
+        });
+
+      // if (this.authenticated) await router.push('/');
     },
   },
 });
