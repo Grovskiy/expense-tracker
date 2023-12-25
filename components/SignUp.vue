@@ -6,7 +6,7 @@
   import { FetchError } from 'ofetch';
   import { type InferType, object, string } from 'yup';
 
-  const { authSign } = useAuthStore();
+  const { authSignUp } = useAuthStore();
   const { authenticated } = storeToRefs(useAuthStore());
   const router = useRouter();
 
@@ -31,7 +31,7 @@
 
   async function onSubmit(event: FormSubmitEvent<Schema>) {
     try {
-      await authSign(event.data, '/api/auth/sign-up');
+      await authSignUp(event.data);
     } catch (e) {
       if (e && typeof e === 'object') {
         const err = e as FetchError;

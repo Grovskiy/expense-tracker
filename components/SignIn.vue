@@ -5,7 +5,7 @@
   import { storeToRefs } from 'pinia';
   import { FetchError } from 'ofetch';
 
-  const { authSign } = useAuthStore();
+  const { authSignIn } = useAuthStore();
   const { authenticated } = storeToRefs(useAuthStore());
   const router = useRouter();
 
@@ -26,7 +26,7 @@
 
   async function onSubmit(event: FormSubmitEvent<Schema>) {
     try {
-      await authSign(event.data, '/api/auth/sign-in');
+      await authSignIn(event.data);
     } catch (e) {
       if (e && typeof e === 'object') {
         const err = e as FetchError;

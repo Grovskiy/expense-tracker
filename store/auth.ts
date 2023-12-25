@@ -30,26 +30,31 @@ export const useAuthStore = defineStore('auth', {
       tokenCookie.value = accessToken;
       tokenRefreshCookie.value = refreshToken;
     },
-    async authSign(
-      credentials: UserSignInInterface | UserSignUpInterface,
-      url: '/api/auth/sign-in' | '/api/auth/sign-up',
-    ) {
-      await $fetch(url, {
+    async authSignUp(credentials: UserSignUpInterface) {
+      await $fetch('/api/auth/sign-up', {
         method: 'post',
         body: credentials,
       })
-        .then(res => {
-          if (res && typeof res === 'object') {
-            const { accessToken, refreshToken } = res as UserTokensInterface;
-            if (accessToken && refreshToken)
-              this.setAuthenticated({ accessToken, refreshToken });
-          }
-        })
-        .catch((err: FetchError) => {
-          throw err.data;
-        });
-
-      // if (this.authenticated) await router.push('/');
+        .then(res => this.handleRes(res))
+        .catch(err => this.handleError(err));
+    },
+    async authSignIn(credentials: UserSignInInterface) {
+      await $fetch('/api/auth/sign-in', {
+        method: 'post',
+        body: credentials,
+      })
+        .then(res => this.handleRes(res))
+        .catch(err => this.handleError(err));
+    },
+    handleRes(res: object | unknown) {
+      if (res && typeof res === 'object') {
+        const { accessToken, refreshToken } = res as UserTokensInterface;
+        if (accessToken && refreshToken)
+          this.setAuthenticated({ accessToken, refreshToken });
+      }
+    },
+    handleError(err: FetchError) {
+      throw err.data;
     },
   },
 });
