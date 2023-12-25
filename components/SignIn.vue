@@ -1,44 +1,51 @@
 <script setup lang="ts">
-  import type { FormError, FormSubmitEvent } from '#ui/types';
-  import { useAuthStore, type UserTokensInterface } from '~/store/auth';
+  import { object, string, type InferType } from 'yup';
+  import type { FormSubmitEvent } from '#ui/types';
+  import { useAuthStore } from '~/store/auth';
   import { storeToRefs } from 'pinia';
+  import { FetchError } from 'ofetch';
 
-  const { setAuthenticated } = useAuthStore();
+  const { authSignIn } = useAuthStore();
   const { authenticated } = storeToRefs(useAuthStore());
   const router = useRouter();
-  interface UserSignInInterface {
-    email: string;
-    password: string;
-  }
+
+  const schema = object({
+    email: string().email('Invalid email').required('Required'),
+    password: string()
+      .min(8, 'Must be at least 8 characters')
+      .required('Required'),
+  });
+
+  type Schema = InferType<typeof schema>
 
   const state = reactive({
     email: 'test1@test.com', // undefined
     password: 'test1@test.com', // undefined
   });
+  const form = ref();
 
-  const validate = (signInUser: UserSignInInterface): FormError[] => {
-    const errors = [];
-    if (!signInUser.email) errors.push({ path: 'email', message: 'Required' });
-    if (!signInUser.password)
-      errors.push({ path: 'password', message: 'Required' });
-    return errors;
-  };
-  async function onSubmit(event: FormSubmitEvent<UserSignInInterface>) {
-    const { accessToken, refreshToken }: UserTokensInterface = await $fetch(
-      '/api/auth/sign-in',
-      {
-        method: 'post',
-        body: event.data,
-      },
-    );
-    if (accessToken) setAuthenticated({ accessToken, refreshToken });
+  async function onSubmit(event: FormSubmitEvent<Schema>) {
+    try {
+      await authSignIn(event.data);
+    } catch (e) {
+      if (e && typeof e === 'object') {
+        const err = e as FetchError;
+        if (err.statusCode === 400) {
+          form.value.setErrors([
+            { path: 'email', message: err.data?.error },
+            { path: 'password', message: err.data?.error },
+          ]);
+        }
+      }
+    }
     if (authenticated) await router.push('/');
   }
 </script>
 
 <template>
   <UForm
-    :validate="validate"
+    ref="form"
+    :schema="schema"
     :state="state"
     class="space-y-4"
     @submit="onSubmit"
