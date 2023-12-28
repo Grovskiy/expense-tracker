@@ -1,6 +1,9 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   devtools: { enabled: true },
+  routeRules: {
+    '/api/**': { proxy: { to: `${process.env.NUXT_BACKEND_URL}/api/**` } }
+  },
   modules: [
     '@pinia/nuxt',
     '@nuxt/ui',
@@ -10,11 +13,13 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       backendUrl: process.env.NUXT_BACKEND_URL,
+      baseUrl: process.env.NUXT_BASE_URL,
       apiBase: '/api',
       myValue: process.env.NUXT_PUBLIC_MY_VALUE,
     },
   },
 });
+
 // # $config.public.baseUrl in templates
 // # or  | const runtimeConfig = useRuntimeConfig();
 // # and | runtimeConfig.public.baseUrl

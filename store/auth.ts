@@ -1,37 +1,20 @@
 import { defineStore } from 'pinia';
 import type { UserSignInInterface } from '~/interfaces/UserSignInInterface';
-import { FetchError } from 'ofetch';
+import type { IFetchError } from 'ofetch';
 import type { UserSignUpInterface } from '~/interfaces/UserSignUpInterface';
-
-export interface UserTokensInterface {
-  accessToken: string;
-  refreshToken: string;
-}
+import { setAuthFetchHeaders } from '~/utils/setAuthFetchHeaders';
+import type { UserTokensInterface } from '~/interfaces/UserTokensInterface';
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     authenticated: false,
     loading: false,
+    accessToken: useCookie('token').value,
+    refreshToken: useCookie('tokenRefresh').value,
   }),
   actions: {
-    setAuthenticated({ accessToken, refreshToken }: UserTokensInterface) {
-      if (accessToken) {
-        this.setTokenCookie(accessToken, refreshToken);
-        this.authenticated = true;
-      }
-    },
-    logUserOut() {
-      this.setTokenCookie(null, null);
-      this.authenticated = false;
-    },
-    setTokenCookie(accessToken: string | null, refreshToken: string | null) {
-      const tokenCookie = useCookie('token');
-      const tokenRefreshCookie = useCookie('tokenRefresh');
-      tokenCookie.value = accessToken;
-      tokenRefreshCookie.value = refreshToken;
-    },
-    async authSignUp(credentials: UserSignUpInterface) {
-      await $fetch('/api/auth/sign-up', {
+    async authSignUp(credentials: UserSignUpInterface): Promise<void> {
+      await $fetch('/api/Authentication/sign-up', {
         method: 'post',
         body: credentials,
       })
@@ -39,7 +22,7 @@ export const useAuthStore = defineStore('auth', {
         .catch(err => this.handleError(err));
     },
     async authSignIn(credentials: UserSignInInterface) {
-      await $fetch('/api/auth/sign-in', {
+      await $fetch('/api/Authentication/sign-in', {
         method: 'post',
         body: credentials,
       })
@@ -53,8 +36,36 @@ export const useAuthStore = defineStore('auth', {
           this.setAuthenticated({ accessToken, refreshToken });
       }
     },
-    handleError(err: FetchError) {
+    handleError(err: IFetchError) {
       throw err.data;
+    },
+    // async goRefreshTokens(
+    //   accessToken: UserTokensInterface,
+    //   refreshToken: UserTokensInterface,
+    // ): Promise<void> {
+    //   console.log('goRefreshTokens', accessToken, refreshToken);
+    //   await $fetch('/api/auth/refresh-token', {
+    //     method: 'post',
+    //     body: {
+    //       accessToken: accessToken,
+    //       refreshToken: refreshToken,
+    //     },
+    //   })
+    logUserOut() {
+      this.setAuthenticated({ accessToken: null, refreshToken: null });
+    },
+    setAuthenticated({ accessToken, refreshToken }: UserTokensInterface) {
+        this.setTokenCookie({ accessToken, refreshToken });
+        this.authenticated = !!accessToken;
+        setAuthFetchHeaders(accessToken);
+    },
+    setTokenCookie({ accessToken, refreshToken }: UserTokensInterface) {
+      const tokenCookie = useCookie('token');
+      const tokenRefreshCookie = useCookie('tokenRefresh');
+      tokenCookie.value = accessToken;
+      tokenRefreshCookie.value = refreshToken;
+      this.accessToken = accessToken;
+      this.refreshToken = refreshToken;
     },
   },
 });

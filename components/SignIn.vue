@@ -3,7 +3,7 @@
   import type { FormSubmitEvent } from '#ui/types';
   import { useAuthStore } from '~/store/auth';
   import { storeToRefs } from 'pinia';
-  import { FetchError } from 'ofetch';
+  import type { IFetchError } from 'ofetch';
 
   const { authSignIn } = useAuthStore();
   const { authenticated } = storeToRefs(useAuthStore());
@@ -16,7 +16,7 @@
       .required('Required'),
   });
 
-  type Schema = InferType<typeof schema>
+  type Schema = InferType<typeof schema>;
 
   const state = reactive({
     email: 'test1@test.com', // undefined
@@ -28,14 +28,12 @@
     try {
       await authSignIn(event.data);
     } catch (e) {
-      if (e && typeof e === 'object') {
-        const err = e as FetchError;
-        if (err.statusCode === 400) {
-          form.value.setErrors([
-            { path: 'email', message: err.data?.error },
-            { path: 'password', message: err.data?.error },
-          ]);
-        }
+      const err = e as IFetchError['data'];
+      if (err.status === 400) {
+        form.value.setErrors([
+          { path: 'email', message: err.error },
+          { path: 'password', message: err.error },
+        ]);
       }
     }
     if (authenticated) await router.push('/');

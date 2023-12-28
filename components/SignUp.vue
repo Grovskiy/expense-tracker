@@ -3,7 +3,7 @@
   import { useAuthStore } from '~/store/auth';
   import { storeToRefs } from 'pinia';
   import type { ErrorsValidationInterface } from '~/interfaces/ErrorsValidationInterface';
-  import { FetchError } from 'ofetch';
+  import { type IFetchError } from 'ofetch';
   import { type InferType, object, string } from 'yup';
 
   const { authSignUp } = useAuthStore();
@@ -34,10 +34,10 @@
       await authSignUp(event.data);
     } catch (e) {
       if (e && typeof e === 'object') {
-        const err = e as FetchError;
-        if (err.statusCode === 400) {
+        const err = e as IFetchError['data'];
+        if (err.status === 400) {
           form.value.setErrors(
-            err.data?.errors.map(
+            err.errors.map(
               (item: ErrorsValidationInterface): FormError => {
                 return { path: item.field.toLowerCase(), message: item.message };
               },
@@ -46,7 +46,7 @@
         }
       }
     }
-    if (authenticated) await router.push('/');
+    if (authenticated.value) await router.push('/');
   }
 </script>
 

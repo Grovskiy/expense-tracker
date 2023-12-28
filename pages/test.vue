@@ -2,11 +2,9 @@
   const testingVar = ref('empty');
 
   async function test() {
-    const body = await $fetch('/api/expense/test', {
+    await $fetch(`/api/Currencies/update`, {
       method: 'post',
     });
-
-    testingVar.value = body as string;
   }
 </script>
 

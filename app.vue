@@ -1,26 +1,22 @@
 <script setup>
-  import { ofetch } from 'ofetch';
+  import { setAuthFetchHeaders } from '~/utils/setAuthFetchHeaders';
+  import { useAuthStore } from '~/store/auth';
+  import { storeToRefs } from 'pinia';
 
-  const userAuth = useCookie('token');
-  const headers = { 'Content-Type': 'application/json' };
+  const store = useAuthStore();
+  const { accessToken } = storeToRefs(store);
 
-  globalThis.$fetch = ofetch.create({
-    onRequest(context) {
-      context.options.headers = userAuth.value
-        ? { Authorization: `Bearer ${userAuth.value}`, ...headers }
-        : { ...headers };
-    },
-  });
-
+  onMounted(() => {
+    setAuthFetchHeaders(accessToken.value);
+  })
   useHead({
     title: 'Expense tracker',
   });
 </script>
 
 <template>
-  <div>
-    <NuxtLayout>
-      <NuxtPage />
-    </NuxtLayout>
-  </div>
+  <NuxtLoadingIndicator />
+  <NuxtLayout>
+    <NuxtPage />
+  </NuxtLayout>
 </template>
