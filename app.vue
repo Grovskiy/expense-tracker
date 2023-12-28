@@ -1,10 +1,10 @@
 <script setup>
   import { setAuthFetchHeaders } from '~/utils/setAuthFetchHeaders';
-  import { useAuthStore } from '~/store/auth';
   import { storeToRefs } from 'pinia';
+  import { useAuthStore } from '~/store/auth';
 
-  const store = useAuthStore();
-  const { accessToken } = storeToRefs(store);
+  const authStore = useAuthStore();
+  const { accessToken } = storeToRefs(authStore);
 
   onMounted(() => {
     setAuthFetchHeaders(accessToken.value);
