@@ -1,15 +1,23 @@
 <script lang="ts" setup>
+  import { useCategoriesStore } from '~/store/categories';
+
+  const categoriesStore = useCategoriesStore();
+  const { getDefaultCategories } = categoriesStore;
+
   const state = reactive({ isSignUp: false });
   function setIsSignUp(value: boolean) {
     state.isSignUp = value;
   }
+  onMounted(() => {
+    getDefaultCategories();
+  });
 </script>
 
 <template>
   <UCard
     :ui="{
       ring: '',
-      divide: 'divide-y divide-gray-100 dark:divide-gray-800'
+      divide: 'divide-y divide-gray-100 dark:divide-gray-800',
     }"
   >
     <UContainer :ui="{ constrained: 'max-w-sm' }">
