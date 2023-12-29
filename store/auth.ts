@@ -6,6 +6,7 @@ import { setAuthFetchHeaders } from '~/utils/setAuthFetchHeaders';
 import type { UserTokensInterface } from '~/interfaces/UserTokensInterface';
 
 import { useCurrenciesStore } from '~/store/currencies';
+import { useCategoriesStore } from '~/store/categories';
 
 
 export const useAuthStore = defineStore('auth', {
@@ -58,6 +59,7 @@ export const useAuthStore = defineStore('auth', {
       this.setAuthenticated({ accessToken: null, refreshToken: null });
 
       useCurrenciesStore().$reset();
+      useCategoriesStore().$reset();
     },
     setAuthenticated({ accessToken, refreshToken }: UserTokensInterface) {
         this.setTokenCookie({ accessToken, refreshToken });

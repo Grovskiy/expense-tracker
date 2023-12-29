@@ -5,7 +5,7 @@
   import type { ErrorsValidationInterface } from '~/interfaces/ErrorsValidationInterface';
   import { type IFetchError } from 'ofetch';
   import { type InferType, object, string } from 'yup';
-  import CategoriesDefaultList from '~/components/CategoriesDefaultList.vue';
+  import CategoriesDefaultList from '~/components/CategoriesDefaultList';
 
   const { authSignUp } = useAuthStore();
   const { authenticated } = storeToRefs(useAuthStore());
@@ -27,7 +27,7 @@
     lastName: 'Smith', // undefined
     email: 'test1@test.com', // undefined
     password: 'test1@test.com', // undefined
-    defaultCategories: [], // undefined
+    defaultCategories: [],
   });
   const form = ref();
 
@@ -74,7 +74,7 @@
         <UInput v-model="state.email" />
       </UFormGroup>
 
-      <UFormGroup label="Categories" name="categories">
+      <UFormGroup label="Categories" name="defaultCategories">
         <CategoriesDefaultList v-model="state.defaultCategories" />
       </UFormGroup>
 

@@ -27,7 +27,6 @@
     v-model="selected"
     :options="currencies"
     option-attribute="name"
-    value-attribute="id"
     class="h-8"
   >
     <template #label>

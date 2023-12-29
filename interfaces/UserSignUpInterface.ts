@@ -3,5 +3,4 @@ export interface UserSignUpInterface {
   lastName: string;
   email: string;
   password: string;
-  defaultCategories: string[],
 }
