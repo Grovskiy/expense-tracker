@@ -9,8 +9,16 @@
   const selected = ref(currencies.value[0] as CurrenciesInterface);
 
   watch(loaded, () => {
-    selected.value = currencies.value[0];
-  })
+    setDefaultCurrencies();
+  });
+  onMounted(() => {
+    setDefaultCurrencies();
+  });
+
+  function setDefaultCurrencies() {
+    const foundItem = currencies.value.find(item => item.code === 'UAH');
+    selected.value = foundItem ? foundItem : currencies.value[0];
+  }
 </script>
 
 <template>
