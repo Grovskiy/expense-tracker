@@ -5,6 +5,9 @@ import type { UserSignUpInterface } from '~/interfaces/UserSignUpInterface';
 import { setAuthFetchHeaders } from '~/utils/setAuthFetchHeaders';
 import type { UserTokensInterface } from '~/interfaces/UserTokensInterface';
 
+import { useCurrenciesStore } from '~/store/currencies';
+
+
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     authenticated: false,
@@ -53,6 +56,8 @@ export const useAuthStore = defineStore('auth', {
     //   })
     logUserOut() {
       this.setAuthenticated({ accessToken: null, refreshToken: null });
+
+      useCurrenciesStore().$reset();
     },
     setAuthenticated({ accessToken, refreshToken }: UserTokensInterface) {
         this.setTokenCookie({ accessToken, refreshToken });
