@@ -4,8 +4,7 @@
   import type { CategoryPayloadInterface } from '~/interfaces/CategoryPayloadInterface';
   import { useCategoriesStore } from '~/store/categories';
 
-  const categoriesStore = useCategoriesStore();
-  const { postCategories } = categoriesStore;
+  const { postCategories } = useCategoriesStore();
 
   const options = [
     { value: CategoryTypeEnum.Expense, label: 'Витрати' },
@@ -25,13 +24,12 @@
   };
 
   async function onSubmit(event: FormSubmitEvent<CategoryPayloadInterface>) {
-    console.log(event.data);
     await postCategories({
       name: event.data.name,
       type: event.data.type,
       parentCategoryId: null,
-    })
-    console.log('name: ', event.data.name, 'type: ', event.data.type);
+    });
+    state.name = '';
   }
 </script>
 

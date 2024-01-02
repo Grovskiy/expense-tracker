@@ -13,7 +13,7 @@
 </script>
 
 <template>
-  <UButton v-if="familyLoaded && !familyCategories.length" color="white" variant="solid" block>Create category</UButton>
+  <CategoriesCreate v-if="familyLoaded && !familyCategories.length" />
   <USelectMenu
     v-else-if="familyLoaded"
     v-model="selected"

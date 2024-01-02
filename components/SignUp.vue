@@ -5,7 +5,11 @@
   import type { ErrorsValidationInterface } from '~/interfaces/ErrorsValidationInterface';
   import { type IFetchError } from 'ofetch';
   import { type InferType, object, string } from 'yup';
-  import CategoriesDefaultList from '~/components/CategoriesDefaultList';
+  import CategoriesDefaultList from '~/components/CategoriesDefaultList.vue';
+  import { useCategoriesStore } from '~/store/categories';
+
+  const categoriesStore = useCategoriesStore();
+  const { getDefaultCategories } = categoriesStore;
 
   const { authSignUp } = useAuthStore();
   const { authenticated } = storeToRefs(useAuthStore());
@@ -48,6 +52,10 @@
     }
     if (authenticated.value) await router.push('/');
   }
+
+  onMounted(() => {
+    getDefaultCategories();
+  });
 </script>
 
 <template>

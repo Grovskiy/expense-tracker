@@ -35,7 +35,15 @@
             class="mr-2"
             inactive-class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
           >
-            Dashboard
+            Дашборд
+          </ULink>
+          <ULink
+            to="/settings"
+            active-class="text-primary"
+            class="mr-2"
+            inactive-class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+          >
+            Налаштування
           </ULink>
           <ULink
             to="/about"

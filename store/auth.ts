@@ -7,7 +7,7 @@ import type { UserTokensInterface } from '~/interfaces/UserTokensInterface';
 
 import { useCurrenciesStore } from '~/store/currencies';
 import { useCategoriesStore } from '~/store/categories';
-
+import { useTriggerRequests } from '~/store/triggerRequests';
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
@@ -36,8 +36,10 @@ export const useAuthStore = defineStore('auth', {
     handleRes(res: object | unknown) {
       if (res && typeof res === 'object') {
         const { accessToken, refreshToken } = res as UserTokensInterface;
-        if (accessToken && refreshToken)
+        if (accessToken && refreshToken) {
           this.setAuthenticated({ accessToken, refreshToken });
+          useTriggerRequests().triggerRequests();
+        }
       }
     },
     handleError(err: IFetchError) {
@@ -62,9 +64,9 @@ export const useAuthStore = defineStore('auth', {
       useCategoriesStore().$reset();
     },
     setAuthenticated({ accessToken, refreshToken }: UserTokensInterface) {
-        this.setTokenCookie({ accessToken, refreshToken });
-        this.authenticated = !!accessToken;
-        setAuthFetchHeaders(accessToken);
+      this.setTokenCookie({ accessToken, refreshToken });
+      this.authenticated = !!accessToken;
+      setAuthFetchHeaders(accessToken);
     },
     setTokenCookie({ accessToken, refreshToken }: UserTokensInterface) {
       const tokenCookie = useCookie('token');
