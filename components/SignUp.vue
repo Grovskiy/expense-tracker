@@ -5,6 +5,11 @@
   import type { ErrorsValidationInterface } from '~/interfaces/ErrorsValidationInterface';
   import { type IFetchError } from 'ofetch';
   import { type InferType, object, string } from 'yup';
+  import CategoriesDefaultList from '~/components/CategoriesDefaultList.vue';
+  import { useCategoriesStore } from '~/store/categories';
+
+  const categoriesStore = useCategoriesStore();
+  const { getDefaultCategories } = categoriesStore;
 
   const { authSignUp } = useAuthStore();
   const { authenticated } = storeToRefs(useAuthStore());
@@ -19,13 +24,14 @@
       .required('Required'),
   });
 
-  type Schema = InferType<typeof schema>
+  type Schema = InferType<typeof schema>;
 
   const state = reactive({
     firstName: 'John', // undefined
     lastName: 'Smith', // undefined
     email: 'test1@test.com', // undefined
     password: 'test1@test.com', // undefined
+    defaultCategories: [],
   });
   const form = ref();
 
@@ -37,17 +43,19 @@
         const err = e as IFetchError['data'];
         if (err.status === 400) {
           form.value.setErrors(
-            err.errors.map(
-              (item: ErrorsValidationInterface): FormError => {
-                return { path: item.field.toLowerCase(), message: item.message };
-              },
-            ),
+            err.errors.map((item: ErrorsValidationInterface): FormError => {
+              return { path: item.field.toLowerCase(), message: item.message };
+            }),
           );
         }
       }
     }
     if (authenticated.value) await router.push('/');
   }
+
+  onMounted(() => {
+    getDefaultCategories();
+  });
 </script>
 
 <template>
@@ -72,6 +80,10 @@
 
       <UFormGroup label="Email" name="email">
         <UInput v-model="state.email" />
+      </UFormGroup>
+
+      <UFormGroup label="Categories" name="defaultCategories">
+        <CategoriesDefaultList v-model="state.defaultCategories" />
       </UFormGroup>
 
       <UFormGroup label="Password" name="password">

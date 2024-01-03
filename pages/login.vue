@@ -9,7 +9,7 @@
   <UCard
     :ui="{
       ring: '',
-      divide: 'divide-y divide-gray-100 dark:divide-gray-800'
+      divide: 'divide-y divide-gray-100 dark:divide-gray-800',
     }"
   >
     <UContainer :ui="{ constrained: 'max-w-sm' }">
