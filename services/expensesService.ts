@@ -2,17 +2,21 @@ import type { ExpensePayloadInterface } from '~/interfaces/ExpensePayloadInterfa
 import type { ExpenseInterface } from '~/interfaces/ExpenseInterface';
 
 export function expensesService() {
-
-  async function getExpenses(dateFrom: string, dateTo: string) {
+  async function getExpenses(
+    limit: number,
+    offset: number,
+    dateFrom: string,
+    dateTo: string,
+  ) {
     return await $fetch('/api/Expenses', {
       method: 'get',
       query: {
-        limit: 10,
-        offset: 0,
+        limit,
+        offset,
         dateFrom,
         dateTo,
       },
-    })
+    });
   }
   async function postExpense(payload: ExpensePayloadInterface) {
     await $fetch('/api/Expenses', {

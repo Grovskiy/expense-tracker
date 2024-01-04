@@ -19,7 +19,23 @@
     end: dayjs().utc().format(),
   });
   const expenses = ref([] as ExpenseInterface[]);
-  const loadingData = ref(false);
+
+  const numbersArray = (): string[] => {
+    const start = 5;
+    const end = 50;
+    const step = 5;
+
+    let numbersArray = [];
+    for (let i = start; i <= end; i += step) {
+      numbersArray.push(`${i}`);
+    }
+    return numbersArray;
+  };
+
+  const page = ref(1);
+  const optionsLimitItems = numbersArray();
+  const selectedLimitItems = ref<string>(optionsLimitItems[0]); // limit
+  const totalItems = ref(10);
 
   const formattedExpenses = computed<ExpenseInterface[]>(() => {
     return expenses.value.map(
@@ -42,31 +58,57 @@
     );
   });
 
+  const limitItems = computed<number>(() => {
+    return parseInt(selectedLimitItems.value);
+  });
+  const offset = computed(() => {
+    return (page.value - 1) * limitItems.value;
+  });
+
+  watch(page, () => {
+    fetchData();
+  });
+
   onMounted(() => {
     fetchData();
   });
 
   async function fetchData() {
-    loadingData.value = true;
     await expensesService()
-      .getExpenses(chosenDate.value.start, chosenDate.value.end)
+      .getExpenses(
+        limitItems.value,
+        offset.value,
+        chosenDate.value.start,
+        chosenDate.value.end,
+      )
       .then(res => {
         const response = res as ExpensesInterface;
         expenses.value = response.data;
-        loadingData.value = false;
+        totalItems.value = response.total;
+        if (offset.value > totalItems.value) page.value = 1;
       });
   }
 </script>
 
 <template>
-  <div class="flex space-x-2 mb-2">
+  <div class="flex mb-2">
     <DatePickerRange v-model="chosenDate" />
-    <UButton @click="fetchData" label="Ok" />
+    <UButton @click="fetchData" label="Ok" class="ml-2 mr-auto" />
+    <UPagination
+      v-model="page"
+      :page-count="limitItems"
+      :total="totalItems"
+      class="mr-2"
+    />
+    <USelect
+      v-model="selectedLimitItems"
+      :options="optionsLimitItems"
+      @change="fetchData"
+    />
   </div>
   <UTable
     :rows="formattedExpenses"
     :columns="columnsTable"
-    :loading="loadingData"
   />
 </template>
 
