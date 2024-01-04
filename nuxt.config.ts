@@ -15,6 +15,7 @@ export default defineNuxtConfig({
     '@nuxt/ui',
     'nuxt-typed-router',
     ['@nuxtjs/eslint-module', { emitWarning: true }],
+    'dayjs-nuxt',
   ],
   runtimeConfig: {
     public: {
