@@ -6,8 +6,8 @@
   import type { CategoryFamilyInterface } from '~/interfaces/CategoryFamilyInterface';
   import { useCurrenciesStore } from '~/store/currencies';
   import type { CurrenciesInterface } from '~/interfaces/CurrenciesInterface';
-  import type { ExpensesInterface } from '~/interfaces/ExpensesInterface';
-  import type { ExpenseInterface } from '~/interfaces/ExpenseInterface';
+  import type { PaginatedCollectionResponse } from '~/models/PaginatedCollectionResponse';
+  import type { ExpenseModel } from '~/models/expense/ExpenseModel';
   import { columnsTable } from '~/components/Expenses/columnsTable';
 
   const { familyCategories, familyLoaded } = storeToRefs(useCategoriesStore());
@@ -18,7 +18,7 @@
     start: dayjs().add(-2, 'day').utc().format(),
     end: dayjs().utc().format(),
   });
-  const expenses = ref([] as ExpenseInterface[]);
+  const expenses = ref([] as ExpenseModel[]);
 
   const numbersArray = (): string[] => {
     const start = 5;
@@ -37,9 +37,9 @@
   const selectedLimitItems = ref<string>(optionsLimitItems[0]); // limit
   const totalItems = ref(10);
 
-  const formattedExpenses = computed<ExpenseInterface[]>(() => {
+  const formattedExpenses = computed<ExpenseModel[]>(() => {
     return expenses.value.map(
-      (item): ExpenseInterface => ({
+      (item): ExpenseModel => ({
         ...item,
         categoryId: familyLoaded
           ? familyCategories.value.filter(
@@ -74,19 +74,17 @@
   });
 
   async function fetchData() {
-    await expensesService()
-      .getExpenses(
+    const response: PaginatedCollectionResponse<ExpenseModel> =
+      await expensesService().getExpenses(
         limitItems.value,
         offset.value,
         chosenDate.value.start,
         chosenDate.value.end,
-      )
-      .then(res => {
-        const response = res as ExpensesInterface;
-        expenses.value = response.data;
-        totalItems.value = response.total;
-        if (offset.value > totalItems.value) page.value = 1;
-      });
+      );
+
+    expenses.value = response.data;
+    totalItems.value = response.total;
+    if (offset.value > totalItems.value) page.value = 1;
   }
 </script>
 
@@ -106,10 +104,7 @@
       @change="fetchData"
     />
   </div>
-  <UTable
-    :rows="formattedExpenses"
-    :columns="columnsTable"
-  />
+  <UTable :rows="formattedExpenses" :columns="columnsTable" />
 </template>
 
 <style scoped></style>

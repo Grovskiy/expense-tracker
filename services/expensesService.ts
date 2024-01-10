@@ -1,5 +1,6 @@
-import type { ExpensePayloadInterface } from '~/interfaces/ExpensePayloadInterface';
-import type { ExpenseInterface } from '~/interfaces/ExpenseInterface';
+import type { CreateExpenseRequest } from '~/models/expense/CreateExpenseRequest';
+import type { ExpenseModel } from '~/models/expense/ExpenseModel';
+import type { PaginatedCollectionResponse } from '~/models/PaginatedCollectionResponse';
 
 export function expensesService() {
   async function getExpenses(
@@ -7,7 +8,7 @@ export function expensesService() {
     offset: number,
     dateFrom: string,
     dateTo: string,
-  ) {
+  ): Promise<PaginatedCollectionResponse<ExpenseModel>> {
     return await $fetch('/api/Expenses', {
       method: 'get',
       query: {
@@ -18,7 +19,7 @@ export function expensesService() {
       },
     });
   }
-  async function postExpense(payload: ExpensePayloadInterface) {
+  async function postExpense(payload: CreateExpenseRequest) {
     await $fetch('/api/Expenses', {
       method: 'post',
       body: payload,
@@ -29,7 +30,7 @@ export function expensesService() {
       });
   }
 
-  async function deleteExpense(id: ExpenseInterface['id']) {
+  async function deleteExpense(id: ExpenseModel['id']) {
     await $fetch(`/api/Expenses/${id}`, {
       method: 'delete',
       body: {},
