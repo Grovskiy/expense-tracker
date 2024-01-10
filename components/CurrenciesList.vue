@@ -17,6 +17,7 @@
   });
   onMounted(() => {
     setDefaultCurrencies();
+    handlerChangeSelect();
   });
 
   function setDefaultCurrencies() {

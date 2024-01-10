@@ -15,6 +15,9 @@
     selected.value = familyCategories.value[0];
     handlerChangeSelect();
   });
+  onMounted(() => {
+    handlerChangeSelect();
+  })
   function handlerChangeSelect() {
     emit('update', selected.value);
   }
