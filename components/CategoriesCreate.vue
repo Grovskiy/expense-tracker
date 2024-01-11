@@ -37,7 +37,7 @@
   <UForm
     :validate="validate"
     :state="state"
-    class="space-x-2 flex"
+    class="space-x-2"
     @submit="onSubmit"
   >
     <UFormGroup name="nameCategories">

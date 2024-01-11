@@ -32,7 +32,7 @@
           <ULink
             to="/"
             active-class="text-primary"
-            class="mr-2"
+            class="mr-3"
             inactive-class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
           >
             Дашборд
@@ -40,7 +40,7 @@
           <ULink
             to="/settings"
             active-class="text-primary"
-            class="mr-2"
+            class="mr-3"
             inactive-class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
           >
             Налаштування
@@ -48,22 +48,30 @@
           <ULink
             to="/expenses"
             active-class="text-primary"
-            class="mr-2"
+            class="mr-3"
             inactive-class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
           >
             Витрати
           </ULink>
           <ULink
+            to="/incomes"
+            active-class="text-primary"
+            class="mr-3"
+            inactive-class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+          >
+            Надходження
+          </ULink>
+          <ULink
             to="/about"
             active-class="text-primary"
-            class="mr-2"
+            class="mr-3"
             inactive-class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
           >
             About
           </ULink>
           <ULink
             to="/test"
-            class="mr-2"
+            class="mr-3"
             active-class="text-primary"
             inactive-class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
           >
