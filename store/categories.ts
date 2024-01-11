@@ -28,11 +28,11 @@ export const useCategoriesStore = defineStore('categories', {
     familyCategoriesIncome: state =>
       state.familyCategories.filter(
         item => item.type === CategoryTypeEnum.Income,
-      ),
+      ) as CategoryFamilyInterface[],
     familyCategoriesExpense: state =>
       state.familyCategories.filter(
         item => item.type === CategoryTypeEnum.Expense,
-      ),
+      ) as CategoryFamilyInterface[],
   },
   actions: {
     async getDefaultCategories() {

@@ -9,7 +9,12 @@
     <h2 class="mt-3 mb-1">Вибір валюти</h2>
     <CurrenciesList />
 
-    <h2 class="mt-3 mb-1">Вибір категорії, якщо нема категорій, є кнопка створення</h2>
-    <CategoriesFamilyList />
+    <h2 class="mt-3 mb-1">
+      Вибір категорії, якщо нема категорій, є кнопка створення
+    </h2>
+    <h3>Надходження</h3>
+    <CategoriesFamilyList :is-income="true" />
+    <h3>Витрати</h3>
+    <CategoriesFamilyList :is-income="false" />
   </div>
 </template>
