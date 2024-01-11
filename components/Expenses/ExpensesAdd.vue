@@ -16,13 +16,13 @@
     const errors = [];
     if (state.cost === 0)
       errors.push({ path: 'cost', message: 'Значення має бути більше 0' });
-    if (!state.notes)
-      errors.push({ path: 'notes', message: 'Обовʼязково' });
     return errors;
-  }
+  };
   async function onSubmit() {
     state.date = useDayjs().utc().format();
     await expensesService().postExpense(state);
+    state.cost = 0;
+    state.notes = '';
   }
   function handlerCategories(value: CategoryFamilyInterface) {
     state.categoryId = value.id;
@@ -55,8 +55,16 @@
         class="w-36"
       />
     </UFormGroup>
-    <CategoriesFamilyList @update="handlerCategories" class="w-36" />
-    <CurrenciesList @update="handlerCurrencies" class="w-36" />
+    <UFormGroup name="categories">
+      <CategoriesFamilyList
+        :is-income="false"
+        @update="handlerCategories"
+        class="w-36"
+      />
+    </UFormGroup>
+    <UFormGroup name="currencies">
+      <CurrenciesList @update="handlerCurrencies" class="w-36" />
+    </UFormGroup>
     <UFormGroup>
       <UButton type="submit" label="Додати" />
     </UFormGroup>

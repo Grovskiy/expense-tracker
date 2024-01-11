@@ -3,32 +3,43 @@
   import { storeToRefs } from 'pinia';
   import type { CategoryFamilyInterface } from '~/interfaces/CategoryFamilyInterface';
 
+  const props = defineProps<{
+    isIncome: boolean;
+  }>();
+
   const categoriesStore = useCategoriesStore();
-  const { familyCategories, familyLoaded } = storeToRefs(categoriesStore);
+  const { familyCategoriesIncome, familyCategoriesExpense, familyLoaded } =
+    storeToRefs(categoriesStore);
+
+  const formattedCategories = computed(() => {
+    return props.isIncome
+      ? familyCategoriesIncome.value
+      : familyCategoriesExpense.value;
+  });
 
   const emit = defineEmits<{
     update: [value: CategoryFamilyInterface];
   }>();
-  const selected = ref(familyCategories.value[0] as CategoryFamilyInterface);
+  const selected = ref(formattedCategories.value[0] as CategoryFamilyInterface);
 
   watch(familyLoaded, () => {
-    selected.value = familyCategories.value[0];
+    selected.value = formattedCategories.value[0];
     handlerChangeSelect();
   });
   onMounted(() => {
     handlerChangeSelect();
-  })
+  });
   function handlerChangeSelect() {
     emit('update', selected.value);
   }
 </script>
 
 <template>
-  <CategoriesCreate v-if="familyLoaded && !familyCategories.length" />
+  <CategoriesCreate v-if="familyLoaded && !formattedCategories.length" />
   <USelectMenu
     v-else-if="familyLoaded"
     v-model="selected"
-    :options="familyCategories"
+    :options="formattedCategories"
     class="h-8"
     option-attribute="name"
     @change="handlerChangeSelect"
