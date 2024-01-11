@@ -6,18 +6,26 @@
   const store = useCurrenciesStore();
   const { currencies, loaded } = storeToRefs(store);
 
+  const emit = defineEmits<{
+    update: [value: CurrenciesInterface];
+  }>();
   const selected = ref(currencies.value[0] as CurrenciesInterface);
 
   watch(loaded, () => {
     setDefaultCurrencies();
+    handlerChangeSelect();
   });
   onMounted(() => {
     setDefaultCurrencies();
+    handlerChangeSelect();
   });
 
   function setDefaultCurrencies() {
     const foundItem = currencies.value.find(item => item.code === 'UAH');
     selected.value = foundItem ? foundItem : currencies.value[0];
+  }
+  function handlerChangeSelect() {
+    emit('update', selected.value);
   }
 </script>
 
@@ -27,6 +35,7 @@
     v-model="selected"
     :options="currencies"
     option-attribute="name"
+    @change="handlerChangeSelect"
     class="h-8"
   >
     <template #label>

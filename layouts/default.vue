@@ -46,6 +46,14 @@
             Налаштування
           </ULink>
           <ULink
+            to="/expenses"
+            active-class="text-primary"
+            class="mr-2"
+            inactive-class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+          >
+            Витрати
+          </ULink>
+          <ULink
             to="/about"
             active-class="text-primary"
             class="mr-2"
