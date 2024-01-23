@@ -28,12 +28,36 @@
 
   const optionsLimitItems = numbersArray();
 
+  type FinancialModel = IncomeModel | ExpenseModel;
+
+  interface StateInterface {
+    financial: FinancialModel[];
+    page: number;
+    totalItems: number;
+    selectedLimitItems: string;
+  }
+
   const state = reactive({
     financial: [],
     page: 1,
     totalItems: 10,
     selectedLimitItems: optionsLimitItems[0],
-  });
+  } as unknown as StateInterface);
+
+  const itemActions = (row: FinancialModel) => [
+    [
+      // {
+      //   label: 'Edit',
+      //   icon: 'i-heroicons-pencil-square-20-solid',
+      //   click: () => console.log('Edit', row.id),
+      // },
+      {
+        label: 'Delete',
+        icon: 'i-heroicons-trash-20-solid',
+        click: () => removeFinancial(row.id),
+      },
+    ],
+  ];
 
   const nameOfCategory = (item: ExpenseModel | IncomeModel): string =>
     familyCategories.value.filter(
@@ -46,19 +70,19 @@
 
   const formattedFinancial = computed(() => {
     return isIncomeFinancialMode
-      ? state.financial.map((item: IncomeModel) => ({
+      ? state.financial.map((item: FinancialModel) => ({
           id: item.id,
           notes: item.notes,
-          value: item.amount,
-          tax: item.taxAmount,
+          value: (item as IncomeModel).amount,
+          tax: (item as IncomeModel).taxAmount,
           categoryId: nameOfCategory(item),
           currencyId: codeOfCurrencies(item),
           date: dayjs(item.date).format('DD/MM/YYYY HH:mm'),
         }))
-      : state.financial.map((item: ExpenseModel) => ({
+      : state.financial.map((item: FinancialModel) => ({
           id: item.id,
           notes: item.notes,
-          value: item.cost,
+          value: (item as ExpenseModel).cost,
           categoryId: nameOfCategory(item),
           currencyId: codeOfCurrencies(item),
           date: dayjs(item.date).format('DD/MM/YYYY HH:mm'),
@@ -84,25 +108,34 @@
   });
 
   async function fetchData() {
-    const response:
-      | PaginatedCollectionResponse<IncomeModel>
-      | PaginatedCollectionResponse<ExpenseModel> = isIncomeFinancialMode
-      ? await incomesService().getIncomes(
-          limitItems.value,
-          offset.value,
-          chosenDate.value.start,
-          chosenDate.value.end,
-        )
-      : await expensesService().getExpenses(
-          limitItems.value,
-          offset.value,
-          chosenDate.value.start,
-          chosenDate.value.end,
-        );
+    const serviceGetFinancial = isIncomeFinancialMode
+      ? incomesService().getIncomes
+      : expensesService().getExpenses;
+
+    const response: PaginatedCollectionResponse<FinancialModel> =
+      await serviceGetFinancial(
+        limitItems.value,
+        offset.value,
+        chosenDate.value.start,
+        chosenDate.value.end,
+      );
 
     state.financial = response.data;
     state.totalItems = response.total;
     if (offset.value > state.totalItems) state.page = 1;
+  }
+  async function removeFinancial(id: FinancialModel['id']) {
+    const serviceDeleteFinancial = isIncomeFinancialMode
+      ? incomesService().deleteIncome
+      : expensesService().deleteExpense;
+
+    await serviceDeleteFinancial(id).then(() => {
+      useToast().add({
+        title: 'Видалено',
+        timeout: 3000,
+      });
+      fetchData();
+    });
   }
 </script>
 
@@ -125,7 +158,17 @@
   <UTable
     :rows="formattedFinancial"
     :columns="columnsTable(isIncomeFinancialMode)"
-  />
+  >
+    <template #actions-data="{ row }">
+      <UDropdown :items="itemActions(row)">
+        <UButton
+          color="gray"
+          variant="ghost"
+          icon="i-heroicons-ellipsis-horizontal-20-solid"
+        />
+      </UDropdown>
+    </template>
+  </UTable>
 </template>
 
 <style scoped></style>

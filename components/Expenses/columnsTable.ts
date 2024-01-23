@@ -22,6 +22,9 @@ const arrayExpenses = [
     key: 'date',
     label: 'Дата',
   },
+  {
+    key: 'actions'
+  }
 ];
 const arrayIncomes = [
   {
@@ -48,4 +51,7 @@ const arrayIncomes = [
     key: 'date',
     label: 'Дата',
   },
+  {
+    key: 'actions'
+  }
 ];

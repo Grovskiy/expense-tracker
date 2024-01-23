@@ -86,7 +86,7 @@
       />
     </UFormGroup>
     <UFormGroup name="categories">
-      <CategoriesFamilyList @update="handlerCategories" class="w-36" />
+      <CategoriesFamilyList @update="handlerCategories" class="w-56" />
     </UFormGroup>
     <UFormGroup name="currencies">
       <CurrenciesList @update="handlerCurrencies" class="w-36" />

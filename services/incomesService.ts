@@ -3,13 +3,13 @@ import type { IncomeModel } from '~/models/income/IncomeModel';
 import type { CreateIncomeRequest } from '~/models/income/CreateIncomeRequest';
 
 export function incomesService() {
-  async function getIncomes(
+  function getIncomes(
     limit: number,
     offset: number,
     dateFrom: string,
     dateTo: string,
   ): Promise<PaginatedCollectionResponse<IncomeModel>> {
-    return await $fetch('/api/Incomes', {
+    return $fetch('/api/Incomes', {
       method: 'get',
       query: {
         limit,
@@ -30,18 +30,11 @@ export function incomesService() {
       });
   }
 
-  async function deleteIncome(id: IncomeModel['id']) {
-    await $fetch(`/api/Incomes/${id}`, {
+  function deleteIncome(id: IncomeModel['id']) {
+    return $fetch(`/api/Incomes/${id}`, {
       method: 'delete',
       body: {},
-    })
-      .then(res => {
-        console.log(res);
-        handlerThen('Видалено');
-      })
-      .catch(err => {
-        console.log(err);
-      });
+    });
   }
 
   function handlerThen(text: string) {
