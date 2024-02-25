@@ -3,8 +3,7 @@
   import { useCurrenciesStore } from '~/store/currencies';
   import type { CurrenciesInterface } from '~/interfaces/CurrenciesInterface';
 
-  const store = useCurrenciesStore();
-  const { currencies, loaded } = storeToRefs(store);
+  const { currencies, loaded } = storeToRefs(useCurrenciesStore());
 
   const props = defineProps({
     currencyId: { default: '', type: String, required: false },
