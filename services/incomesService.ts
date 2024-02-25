@@ -1,15 +1,15 @@
-import type { CreateExpenseRequest } from '~/models/expense/CreateExpenseRequest';
-import type { ExpenseModel } from '~/models/expense/ExpenseModel';
 import type { PaginatedCollectionResponse } from '~/models/PaginatedCollectionResponse';
+import type { IncomeModel } from '~/models/income/IncomeModel';
+import type { CreateIncomeRequest } from '~/models/income/CreateIncomeRequest';
 
-export function expensesService() {
-  function getExpenses(
+export function incomesService() {
+  function getIncomes(
     limit: number,
     offset: number,
     dateFrom: string,
     dateTo: string,
-  ): Promise<PaginatedCollectionResponse<ExpenseModel>> {
-    return $fetch('/api/Expenses', {
+  ): Promise<PaginatedCollectionResponse<IncomeModel>> {
+    return $fetch('/api/Incomes', {
       method: 'get',
       query: {
         limit,
@@ -19,8 +19,8 @@ export function expensesService() {
       },
     });
   }
-  async function postExpense(payload: CreateExpenseRequest) {
-    await $fetch('/api/Expenses', {
+  async function postIncome(payload: CreateIncomeRequest) {
+    await $fetch('/api/Incomes', {
       method: 'post',
       body: payload,
     })
@@ -30,13 +30,14 @@ export function expensesService() {
       });
   }
 
-  function changeExpense(payload: ExpenseModel) {
-    const { id, cost, notes, date, categoryId, currencyId } = payload;
-    return $fetch(`/api/Expenses/${id}`, {
+  function changeIncome(payload: IncomeModel) {
+    const { id, notes, amount, taxAmount, date, categoryId, currencyId } = payload;
+    return $fetch(`/api/Incomes/${id}`, {
       method: 'put',
       body: {
-        cost,
         notes,
+        amount,
+        taxAmount,
         date,
         categoryId,
         currencyId,
@@ -44,8 +45,8 @@ export function expensesService() {
     });
   }
 
-  function deleteExpense(id: ExpenseModel['id']) {
-    return $fetch(`/api/Expenses/${id}`, {
+  function deleteIncome(id: IncomeModel['id']) {
+    return $fetch(`/api/Incomes/${id}`, {
       method: 'delete',
       body: {},
     });
@@ -59,9 +60,9 @@ export function expensesService() {
   }
 
   return {
-    getExpenses,
-    postExpense,
-    changeExpense,
-    deleteExpense,
+    getIncomes,
+    postIncome,
+    changeIncome,
+    deleteIncome,
   };
 }

@@ -1,6 +1,9 @@
-export const columnsTable = [
+export const columnsTable = (isIncome: boolean | undefined) =>
+  isIncome ? arrayIncomes : arrayExpenses;
+
+const arrayExpenses = [
   {
-    key: 'categoryId',
+    key: 'categoryName',
     label: 'Категорія',
   },
   {
@@ -8,15 +11,47 @@ export const columnsTable = [
     label: 'Нотатки',
   },
   {
-    key: 'cost',
+    key: 'value',
     label: 'Сума',
   },
   {
-    key: 'currencyId',
+    key: 'currencyName',
     label: 'Валюта',
   },
   {
     key: 'date',
     label: 'Дата',
   },
+  {
+    key: 'actions'
+  }
+];
+const arrayIncomes = [
+  {
+    key: 'categoryName',
+    label: 'Категорія',
+  },
+  {
+    key: 'notes',
+    label: 'Нотатки',
+  },
+  {
+    key: 'value',
+    label: 'Сума',
+  },
+  {
+    key: 'tax',
+    label: 'Податок',
+  },
+  {
+    key: 'currencyName',
+    label: 'Валюта',
+  },
+  {
+    key: 'date',
+    label: 'Дата',
+  },
+  {
+    key: 'actions'
+  }
 ];
