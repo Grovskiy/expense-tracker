@@ -6,6 +6,10 @@
   const store = useCurrenciesStore();
   const { currencies, loaded } = storeToRefs(store);
 
+  const props = defineProps({
+    currencyId: { default: '', type: String, required: false },
+  });
+
   const emit = defineEmits<{
     update: [value: CurrenciesInterface];
   }>();
@@ -16,7 +20,13 @@
     handlerChangeSelect();
   });
   onMounted(() => {
-    setDefaultCurrencies();
+    if (props.currencyId) {
+      selected.value = currencies.value.filter(
+        (currency: CurrenciesInterface) => currency.id === props.currencyId,
+      )[0];
+    } else {
+      setDefaultCurrencies();
+    }
     handlerChangeSelect();
   });
 

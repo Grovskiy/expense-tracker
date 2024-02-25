@@ -3,7 +3,7 @@ export const columnsTable = (isIncome: boolean | undefined) =>
 
 const arrayExpenses = [
   {
-    key: 'categoryId',
+    key: 'categoryName',
     label: 'Категорія',
   },
   {
@@ -15,7 +15,7 @@ const arrayExpenses = [
     label: 'Сума',
   },
   {
-    key: 'currencyId',
+    key: 'currencyName',
     label: 'Валюта',
   },
   {
@@ -28,7 +28,7 @@ const arrayExpenses = [
 ];
 const arrayIncomes = [
   {
-    key: 'categoryId',
+    key: 'categoryName',
     label: 'Категорія',
   },
   {
@@ -44,7 +44,7 @@ const arrayIncomes = [
     label: 'Податок',
   },
   {
-    key: 'currencyId',
+    key: 'currencyName',
     label: 'Валюта',
   },
   {

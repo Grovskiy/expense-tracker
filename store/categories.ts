@@ -17,7 +17,7 @@ export const useCategoriesStore = defineStore('categories', {
       {
         id: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
         name: 'string',
-        type: 0,
+        type: 'Expense',
         subcategories: ['string'],
       },
     ] as CategoryFamilyInterface[],

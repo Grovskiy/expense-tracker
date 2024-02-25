@@ -30,6 +30,21 @@ export function incomesService() {
       });
   }
 
+  function changeIncome(payload: IncomeModel) {
+    const { id, notes, amount, taxAmount, date, categoryId, currencyId } = payload;
+    return $fetch(`/api/Incomes/${id}`, {
+      method: 'put',
+      body: {
+        notes,
+        amount,
+        taxAmount,
+        date,
+        categoryId,
+        currencyId,
+      },
+    });
+  }
+
   function deleteIncome(id: IncomeModel['id']) {
     return $fetch(`/api/Incomes/${id}`, {
       method: 'delete',
@@ -47,6 +62,7 @@ export function incomesService() {
   return {
     getIncomes,
     postIncome,
+    changeIncome,
     deleteIncome,
   };
 }

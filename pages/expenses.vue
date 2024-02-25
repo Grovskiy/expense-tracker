@@ -1,16 +1,11 @@
 <script setup lang="ts">
   import FinancialList from '~/components/Expenses/FinancialList.vue';
-  import FinancialAdd from '~/components/Expenses/FinancialAdd.vue';
 
   provide('isIncomeFinancialMode', false);
 </script>
 
 <template>
-  <h1 class="font-bold text-center text-xl">Витрати</h1>
-  <h2 class="mt-4 mb-3">Додати витрати</h2>
-  <FinancialAdd />
-
-  <h2 class="mt-4 mb-3">Показати витрати</h2>
+  <h1 class="font-bold text-center text-xl mb-5">Витрати</h1>
   <FinancialList />
 </template>
 

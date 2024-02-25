@@ -5,6 +5,10 @@
 
   const isIncomeFinancialMode = inject('isIncomeFinancialMode');
 
+  const props = defineProps({
+    categoryId: { default: '', type: String, required: false },
+  });
+
   const categoriesStore = useCategoriesStore();
   const { familyCategoriesIncome, familyCategoriesExpense, familyLoaded } =
     storeToRefs(categoriesStore);
@@ -25,6 +29,11 @@
     handlerChangeSelect();
   });
   onMounted(() => {
+    if (props.categoryId) {
+      selected.value = formattedCategories.value.filter(
+        (category: CategoryFamilyInterface) => category.id === props.categoryId,
+      )[0];
+    }
     handlerChangeSelect();
   });
   function handlerChangeSelect() {

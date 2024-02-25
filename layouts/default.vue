@@ -12,21 +12,24 @@
     router.push('/login');
   };
 
-  const colorMode = useColorMode()
+  const colorMode = useColorMode();
   const isDark = computed({
-    get () {
-      return colorMode.value === 'dark'
+    get() {
+      return colorMode.value === 'dark';
     },
-    set () {
-      colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark'
-    }
-  })
+    set() {
+      colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark';
+    },
+  });
 </script>
 <template>
   <div>
     <header>
       <UContainer class="flex mt-2">
-        <UIcon class="text-5xl text-gray-700 dark:text-gray-200 mr-2" name="i-heroicons-presentation-chart-line" />
+        <UIcon
+          class="text-5xl text-gray-700 dark:text-gray-200 mr-2"
+          name="i-heroicons-presentation-chart-line"
+        />
 
         <div class="flex items-center w-full">
           <ULink
@@ -91,7 +94,9 @@
         </div>
         <ClientOnly>
           <UButton
-            :icon="isDark ? 'i-heroicons-moon-20-solid' : 'i-heroicons-sun-20-solid'"
+            :icon="
+              isDark ? 'i-heroicons-moon-20-solid' : 'i-heroicons-sun-20-solid'
+            "
             color="gray"
             variant="ghost"
             aria-label="Theme"

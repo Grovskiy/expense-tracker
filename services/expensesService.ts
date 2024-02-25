@@ -30,11 +30,25 @@ export function expensesService() {
       });
   }
 
+  function changeExpense(payload: ExpenseModel) {
+    const { id, cost, notes, date, categoryId, currencyId } = payload;
+    return $fetch(`/api/Expenses/${id}`, {
+      method: 'put',
+      body: {
+        cost,
+        notes,
+        date,
+        categoryId,
+        currencyId,
+      },
+    });
+  }
+
   function deleteExpense(id: ExpenseModel['id']) {
     return $fetch(`/api/Expenses/${id}`, {
       method: 'delete',
       body: {},
-    })
+    });
   }
 
   function handlerThen(text: string) {
@@ -47,6 +61,7 @@ export function expensesService() {
   return {
     getExpenses,
     postExpense,
+    changeExpense,
     deleteExpense,
   };
 }
