@@ -5,6 +5,7 @@
   import type { CreateExpenseRequest } from '~/models/expense/CreateExpenseRequest';
   import type { CreateIncomeRequest } from '~/models/income/CreateIncomeRequest';
   import { incomesService } from '~/services/incomesService';
+  import type { FinancialCommonModel } from '~/models/FinancialCommonModel';
 
   const isIncomeFinancialMode = inject('isIncomeFinancialMode');
 
@@ -15,7 +16,7 @@
       required: false,
     },
     id: { default: '', type: String, required: false },
-    notes: { default: '', type: String, required: false },
+    text: { default: '', type: String, required: false },
     value: { default: undefined, type: Number || undefined, required: false },
     tax: { default: undefined, type: Number || undefined, required: false },
     date: { default: '', type: String, required: false },
@@ -23,27 +24,40 @@
     currencyId: { default: '', type: String, required: false },
   });
 
+  // tax?: number;
+
+  // date: string;
+  // anotherDate?: string;
+  // dateLabel: string;
+  // anotherDateLabel?: string;
+
+  // frequency?: FrequencyEnum;
+  const dayjs = useDayjs();
+
   const state = reactive({
-    value: undefined,
-    tax: undefined,
-    notes: '',
+    value: 0,
+    tax: 0,
+    text: '',
+    date: dayjs().utc().format(),
     categoryId: '',
     currencyId: '',
-  });
+  } as unknown as FinancialCommonModel);
 
   onMounted(() => {
     if (props.editMode) {
       state.value = props.value;
       state.tax = props.tax;
-      state.notes = props.notes;
-      state.date = useDayjs(props.date).utc().format();
+      state.text = props.text;
+      console.log(state.date, '+', dayjs(props.date).utc().format());
+
+      if (props.date) state.date = dayjs(props.date).utc().format();
       state.categoryId = props.categoryId;
       state.currencyId = props.currencyId;
     }
   });
 
   const emit = defineEmits<{
-    editDone: [value: object];
+    editDone: [value: FinancialCommonModel];
     addDone: [];
     deleteDone: [];
   }>();
@@ -64,7 +78,7 @@
     const payloadExpense: CreateExpenseRequest = {
       date,
       cost: state.value,
-      notes: state.notes,
+      notes: state.text,
       categoryId: state.categoryId,
       currencyId: state.currencyId,
     };
@@ -72,7 +86,7 @@
       date,
       amount: state.value,
       taxAmount: state.tax,
-      notes: state.notes,
+      notes: state.text,
       categoryId: state.categoryId,
       currencyId: state.currencyId,
     };
@@ -83,9 +97,9 @@
       : await expensesService()
           .postExpense(payloadExpense)
           .then(() => emit('addDone'));
-    state.value = undefined;
-    state.tax = undefined;
-    state.notes = '';
+    state.value = 0;
+    state.tax = 0;
+    state.text = '';
   }
   function handlerCategories(value: CategoryFamilyInterface) {
     state.categoryId = value?.id;
@@ -111,10 +125,10 @@
     <UFormGroup label="Податок" v-if="isIncomeFinancialMode" name="tax">
       <UInput placeholder="Податок" v-model="state.tax" type="number" />
     </UFormGroup>
-    <UFormGroup label="Нотатка" name="notes">
+    <UFormGroup label="Нотатка" name="text">
       <UInput
         placeholder="Продукти та кока кола..."
-        v-model="state.notes"
+        v-model="state.text"
         type="text"
       />
     </UFormGroup>
@@ -129,6 +143,9 @@
         :currency-id="props.currencyId"
         @update="handlerCurrencies"
       />
+    </UFormGroup>
+    <UFormGroup label="Дата">
+      <DatePicker v-model="state.date" />
     </UFormGroup>
     <div class="flex justify-between space-x-2">
       <UButton type="submit" label="Готово" />

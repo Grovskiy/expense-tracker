@@ -41,12 +41,12 @@
             Дашборд
           </ULink>
           <ULink
-            to="/settings"
+            to="/subscriptions"
             active-class="text-primary"
             class="mr-3"
             inactive-class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
           >
-            Налаштування
+            Підписки
           </ULink>
           <ULink
             to="/expenses"
@@ -63,6 +63,14 @@
             inactive-class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
           >
             Надходження
+          </ULink>
+          <ULink
+            to="/settings"
+            active-class="text-primary"
+            class="mr-3"
+            inactive-class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+          >
+            Налаштування
           </ULink>
           <ULink
             to="/about"

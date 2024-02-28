@@ -9,23 +9,20 @@
 
 <template>
   <VDatePicker
-    v-model.range.string="range"
+    v-model="range"
     color="gray"
     :is-dark="$colorMode.value === 'dark'"
-    show-weeknumbers="left-outside"
   >
     <template #default="{ inputValue, inputEvents }">
       <div class="relative">
         <UBadge
-          color="emerald"
-          variant="subtle"
+          color="white"
+          variant="solid"
           size="lg"
-          v-on="inputEvents.start"
+          v-on="inputEvents"
           class="cursor-default"
         >
-          {{ inputValue.start }}
-          -
-          {{ inputValue.end }}
+          {{ inputValue }}
           <UIcon name="i-heroicons-calendar-days" class="ml-1" />
         </UBadge>
       </div>
