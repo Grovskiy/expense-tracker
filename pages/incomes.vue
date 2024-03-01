@@ -3,11 +3,11 @@
   import { FinancialModeEnum } from '~/enums/FinancialModeEnum';
   import { FinancialModeKey } from '~/injectionKeys/FinancialModeKey';
 
-  provide(FinancialModeKey, FinancialModeEnum.Expenses);
+  provide(FinancialModeKey, FinancialModeEnum.Incomes);
 </script>
 
 <template>
-  <h1 class="font-bold text-center text-xl mb-5">Витрати</h1>
+  <h1 class="font-bold text-center text-xl mb-5">Надходження</h1>
   <FinancialList />
 </template>
 

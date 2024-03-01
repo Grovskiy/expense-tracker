@@ -2,17 +2,22 @@
   import { useCategoriesStore } from '~/store/categories';
   import { storeToRefs } from 'pinia';
   import type { CategoryFamilyInterface } from '~/interfaces/CategoryFamilyInterface';
+  import { FinancialModeKey } from '~/injectionKeys/FinancialModeKey';
+  import { FinancialModeEnum } from '~/enums/FinancialModeEnum';
 
-  const props = defineProps<{
-    isIncome: boolean;
-  }>();
+  const injectedFinancialMode = inject(FinancialModeKey);
+
+  const props = defineProps({
+    categoryId: { default: '', type: String, required: false },
+  });
 
   const categoriesStore = useCategoriesStore();
   const { familyCategoriesIncome, familyCategoriesExpense, familyLoaded } =
     storeToRefs(categoriesStore);
 
   const formattedCategories = computed(() => {
-    return props.isIncome
+    return injectedFinancialMode === FinancialModeEnum.Incomes ||
+      injectedFinancialMode === FinancialModeEnum.RepeatableIncomes
       ? familyCategoriesIncome.value
       : familyCategoriesExpense.value;
   });
@@ -27,6 +32,11 @@
     handlerChangeSelect();
   });
   onMounted(() => {
+    if (props.categoryId) {
+      selected.value = formattedCategories.value.filter(
+        (category: CategoryFamilyInterface) => category.id === props.categoryId,
+      )[0];
+    }
     handlerChangeSelect();
   });
   function handlerChangeSelect() {
