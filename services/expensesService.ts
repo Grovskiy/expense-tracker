@@ -1,14 +1,17 @@
-import type { CreateExpenseRequest } from '~/models/expense/CreateExpenseRequest';
 import type { ExpenseModel } from '~/models/expense/ExpenseModel';
 import type { PaginatedCollectionResponse } from '~/models/PaginatedCollectionResponse';
+import type { FinancialServiceInterface } from './FinancialServiceInterface';
+import type { FinancialCommonModel } from '~/models/FinancialCommonModel';
+import { FrequencyEnum } from '~/enums/FrequencyEnum';
+import { StatusSubEnum } from '~/enums/StatusSubEnum';
 
-export function expensesService() {
-  function getExpenses(
+export function expensesService(): FinancialServiceInterface {
+  async function getFinancial(
     limit: number,
     offset: number,
     dateFrom: string,
     dateTo: string,
-  ): Promise<PaginatedCollectionResponse<ExpenseModel>> {
+  ): Promise<PaginatedCollectionResponse<FinancialCommonModel>> {
     return $fetch('/api/Expenses', {
       method: 'get',
       query: {
@@ -17,51 +20,68 @@ export function expensesService() {
         dateFrom,
         dateTo,
       },
+    }).then((response) => {
+      const res = response as unknown as PaginatedCollectionResponse<ExpenseModel>
+      const mappedData = res.data.map((item: ExpenseModel) => mapToCommonModel(item));
+
+      return {
+        data: mappedData,
+        limit: res.limit,
+        offset: res.offset,
+        total: res.total,
+      };
     });
   }
-  async function postExpense(payload: CreateExpenseRequest) {
-    await $fetch('/api/Expenses', {
+
+  function postFinancial(payload: FinancialCommonModel) {
+    return $fetch('/api/Expenses', {
       method: 'post',
-      body: payload,
-    })
-      .then(() => handlerThen('Додано'))
-      .catch(err => {
-        console.log(err);
-      });
-  }
-
-  function changeExpense(payload: ExpenseModel) {
-    const { id, cost, notes, date, categoryId, currencyId } = payload;
-    return $fetch(`/api/Expenses/${id}`, {
-      method: 'put',
-      body: {
-        cost,
-        notes,
-        date,
-        categoryId,
-        currencyId,
-      },
+      body: mapToSubModel(payload),
     });
   }
 
-  function deleteExpense(id: ExpenseModel['id']) {
+  function changeFinancial(payload: FinancialCommonModel) {
+    return $fetch(`/api/Expenses/${payload.id}`, {
+      method: 'put',
+      body: mapToSubModel(payload),
+    });
+  }
+
+  function deleteFinancial(id: FinancialCommonModel['id']) {
     return $fetch(`/api/Expenses/${id}`, {
       method: 'delete',
       body: {},
     });
   }
 
-  function handlerThen(text: string) {
-    useToast().add({
-      title: text,
-      timeout: 3000,
-    });
+  function mapToSubModel(item: FinancialCommonModel): ExpenseModel {
+    return {
+      notes: item.text,
+      cost: item.value,
+      date: item.date,
+      categoryId: item.categoryId,
+      currencyId: item.currencyId
+    }
+  }
+  function mapToCommonModel(item: ExpenseModel): FinancialCommonModel {
+    return {
+      id: item.id,
+      text: item.notes,
+      value: item.cost,
+      tax: 0,
+      date: item.date,
+      anotherDate: '', // not used
+      frequency: FrequencyEnum.Weekly, // not used
+      status: StatusSubEnum.Active, // not used
+      categoryId: item.categoryId,
+      currencyId: item.currencyId
+    }
   }
 
   return {
-    getExpenses,
-    postExpense,
-    changeExpense,
-    deleteExpense,
+    getFinancial,
+    postFinancial,
+    changeFinancial,
+    deleteFinancial,
   };
 }

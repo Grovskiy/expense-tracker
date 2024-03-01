@@ -17,8 +17,8 @@
     <template #default="{ inputValue, inputEvents }">
       <div class="relative">
         <UBadge
-          color="emerald"
-          variant="subtle"
+          color="white"
+          variant="solid"
           size="lg"
           v-on="inputEvents.start"
           class="cursor-default"

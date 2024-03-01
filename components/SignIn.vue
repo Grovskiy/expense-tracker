@@ -24,6 +24,7 @@
   });
   const form = ref();
 
+  // TODO: add loader
   async function onSubmit(event: FormSubmitEvent<Schema>) {
     try {
       await authSignIn(event.data);

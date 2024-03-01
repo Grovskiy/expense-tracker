@@ -1,5 +1,5 @@
 export enum FrequencyEnum {
-  Daily = 'Daily',
+  // Daily = 'Daily',
   Weekly = 'Weekly',
   BiWeekly = 'BiWeekly',
   EveryFourWeeks = 'EveryFourWeeks',

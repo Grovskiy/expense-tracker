@@ -1,18 +1,17 @@
 <script setup lang="ts">
   import DatePickerRange from '~/components/DatePickerRange.vue';
-  import { expensesService } from '~/services/expensesService';
-  import type { PaginatedCollectionResponse } from '~/models/PaginatedCollectionResponse';
-  import type { ExpenseModel } from '~/models/expense/ExpenseModel';
   import { numbersArray } from '~/components/Expenses/optionsLimitItems';
-  import { incomesService } from '~/services/incomesService';
-  import type { IncomeModel } from '~/models/income/IncomeModel';
   import FinancialAdd from '~/components/Expenses/FinancialAdd.vue';
-  import { FinancialModeEnum } from '~/enums/FinancialModeEnum';
   import type { FinancialCommonModel } from '~/models/FinancialCommonModel';
+  import { FinancialModeKey } from '~/injectionKeys/FinancialModeKey';
+  import { FrequencyEnum } from '~/enums/FrequencyEnum';
+  import { StatusSubEnum } from '~/enums/StatusSubEnum';
+  import { FinancialModeEnum } from '~/enums/FinancialModeEnum';
+  import { FinancialServiceContex } from '~/services/FinancialServiceContex';
 
-  const props = defineProps<{
-    financialMode: FinancialModeEnum;
-  }>();
+  const injectedFinancialMode = inject(FinancialModeKey);
+
+  const serviceFinancial = FinancialServiceContex(injectedFinancialMode);
 
   const dayjs = useDayjs();
   const chosenDate = ref({
@@ -32,8 +31,8 @@
   const state = reactive({
     financialArray: [],
     page: 1,
-    totalItems: 10,
-    selectedLimitItems: optionsLimitItems[0],
+    totalItems: 5,
+    selectedLimitItems: optionsLimitItems[2],
   } as unknown as StateInterface);
 
   const limitItems = computed<number>(() => {
@@ -50,134 +49,86 @@
     },
   );
 
+  const isIncomesMode = computed(
+    () => injectedFinancialMode === FinancialModeEnum.Incomes,
+  );
+  const isExpensesMode = computed(
+    () => injectedFinancialMode === FinancialModeEnum.Expenses,
+  );
+
   onMounted(() => {
     fetchData();
   });
 
-  // get financial
   async function fetchData() {
-    const payload: [number, number, string, string] = [
-      limitItems.value,
-      offset.value,
-      chosenDate.value.start,
-      chosenDate.value.end,
-    ];
+    const payload: [number, number, string?, string?] =
+      isIncomesMode || isExpensesMode
+        ? [
+            limitItems.value,
+            offset.value,
+            chosenDate.value.start,
+            chosenDate.value.end,
+          ]
+        : [limitItems.value, offset.value];
 
-    if (props.financialMode === FinancialModeEnum.Expenses) {
-      const res: PaginatedCollectionResponse<ExpenseModel> =
-        await expensesService().getExpenses(...payload);
-      state.financialArray = res.data.map(
-        (item: ExpenseModel): FinancialCommonModel => ({
-          ...item,
-          id: item.id,
-          text: item.notes,
-          value: item.cost,
-        }),
-      );
-      state.totalItems = res.total;
-    }
-    if (props.financialMode === FinancialModeEnum.Incomes) {
-      const res: PaginatedCollectionResponse<IncomeModel> =
-        await incomesService().getIncomes(...payload);
-      state.financialArray = res.data.map(
-        (item: IncomeModel): FinancialCommonModel => ({
-          ...item,
-          id: item.id,
-          text: item.notes,
-          value: item.amount,
-          tax: item.taxAmount,
-        }),
-      );
-      state.totalItems = res.total;
-    }
+    const response = await serviceFinancial.getFinancial(...payload);
+
+    state.financialArray = response.data;
+    state.totalItems = response.total;
     if (offset.value > state.totalItems) state.page = 1;
   }
-  // get financial end
 
-  // change financial
-  async function changeFinancial(payload: FinancialCommonModel) {
-    console.log(payload);
-
-    const payloadExpense: ExpenseModel = {
-      id: payload.id,
-      date: payload.date,
-      cost: payload.value,
-      notes: payload.text,
-      categoryId: payload.categoryId,
-      currencyId: payload.currencyId,
-    };
-    const payloadIncome: IncomeModel = {
-      id: payload.id,
-      date: payload.date,
-      amount: payload.value,
-      taxAmount: payload.tax ? payload.tax : 0,
-      notes: payload.text,
-      categoryId: payload.categoryId,
-      currencyId: payload.currencyId,
-    };
-    const serviceChangeFinancial =
-      props.financialMode === FinancialModeEnum.Incomes
-        ? incomesService().changeIncome(payloadIncome)
-        : expensesService().changeExpense(payloadExpense);
-    console.log(payloadExpense);
-    await serviceChangeFinancial.then(() => {
-      useToast().add({
-        title: 'Оновлено',
-        timeout: 3000,
-      });
-      updateDataTable();
-    });
+  async function createFinancial(payload: FinancialCommonModel) {
+    await serviceFinancial
+      .postFinancial(payload)
+      .then(() => actionEnded('Створено'));
   }
-  // change financial end
 
-  // remove financial
+  async function editFinancial(payload: FinancialCommonModel) {
+    await serviceFinancial
+      .changeFinancial(payload)
+      .then(() => actionEnded('Змінено'));
+  }
+
   async function removeFinancial(id: FinancialCommonModel['id']) {
-    const serviceDeleteFinancial =
-      props.financialMode === FinancialModeEnum.Incomes
-        ? incomesService().deleteIncome
-        : expensesService().deleteExpense;
-
-    await serviceDeleteFinancial(id).then(() => {
-      useToast().add({
-        title: 'Видалено',
-        timeout: 3000,
-      });
-      updateDataTable();
-      setIsOpenSideover(false, false);
-    });
+    await serviceFinancial
+      .deleteFinancial(id)
+      .then(() => actionEnded('Видалено'));
   }
-  // remove financial end
 
-  const stateSideOver = reactive({
+  const stateSideOver: Ref<FinancialCommonModel> = ref({
     id: '',
-    notes: '',
     value: 0,
     tax: 0,
+    text: '',
     date: '',
+    anotherDate: '',
+    frequency: FrequencyEnum.Weekly,
+    status: StatusSubEnum.Active,
     categoryId: '',
     currencyId: '',
-  } as unknown as FinancialCommonModel);
+  });
   const isOpenSideover = ref(false);
-  const handleEditRow = (row: FinancialCommonModel) => {
-    console.log(row);
+  const isEditFinancialAction = ref(false);
 
-    stateSideOver.id = row.id;
-    stateSideOver.text = row.text;
-    stateSideOver.value = row.value;
-    if (row.tax) stateSideOver.tax = row.tax;
-    stateSideOver.date = row.date;
-    stateSideOver.categoryId = row.categoryId;
-    stateSideOver.currencyId = row.currencyId;
+  const handleEditRow = (row: FinancialCommonModel) => {
+    stateSideOver.value = row;
     setIsOpenSideover(true, true);
   };
-  const handlerEmitEdit = (payload: FinancialCommonModel) => {
-    changeFinancial(payload);
-    setIsOpenSideover(false, false);
-  };
-  const handlerAddEdit = () => {
+  const actionEnded = (text: string) => {
+    useToast().add({
+      title: text,
+      timeout: 3000,
+    });
     updateDataTable();
     setIsOpenSideover(false, false);
   };
+
+  const setIsOpenSideover = (value: boolean, isEdit: boolean) => {
+    isOpenSideover.value = value;
+    isEditFinancialAction.value = isEdit;
+  };
+
   const updateDataTable = () => {
     chosenDate.value.end = dayjs(chosenDate.value.end)
       .add(1, 'hour')
@@ -185,67 +136,37 @@
       .format();
     fetchData();
   };
-
-  const isEditFinancialAction = ref(false);
-
-  const propsToPassFinancialaction = computed(() => {
-    if (isEditFinancialAction.value) {
-      return { ...stateSideOver, 'edit-mode': true };
-    } else {
-      return {}; // no props
-    }
-  });
-
-  const setIsOpenSideover = (value: boolean, isEdit: boolean) => {
-    isOpenSideover.value = value;
-    isEditFinancialAction.value = isEdit;
-  };
 </script>
 
 <template>
-  <div class="flex mt-4 mb-2">
-    <DatePickerRange v-model="chosenDate" />
-    <UButton @click="fetchData" label="Ok" class="ml-2" />
-    <UButton
-      @click="setIsOpenSideover(true, false)"
-      :label="`Додати ${
-        props.financialMode === FinancialModeEnum.Incomes
-          ? 'надходження'
-          : 'витрати'
-      }`"
-      class="ml-2 mr-auto"
-    />
-    <UPagination
-      v-model="state.page"
-      :page-count="limitItems"
-      :total="state.totalItems"
-      class="mr-2"
-    />
-    <USelect
-      v-model="state.selectedLimitItems"
-      :options="optionsLimitItems"
-      @change="fetchData"
-    />
-  </div>
-  <USlideover v-model="isOpenSideover">
-    <div class="flex items-center justify-end m-2">
+  <div class="flex flex-col max-w-sm mx-auto">
+    <div
+      v-if="isIncomesMode || isExpensesMode"
+      class="flex justify-between mt-4 mb-2"
+    >
+      <DatePickerRange v-model="chosenDate" />
       <UButton
-        color="gray"
-        variant="ghost"
-        icon="i-heroicons-x-mark-20-solid"
-        @click="setIsOpenSideover(false, false)"
+        @click="fetchData"
+        variant="outline"
+        icon="i-heroicons-arrow-path-rounded-square-solid"
+        class="ml-2"
+      />
+      <UButton
+        @click="setIsOpenSideover(true, false)"
+        variant="outline"
+        icon="i-heroicons-plus-circle"
+        class="ml-auto"
       />
     </div>
-    <div class="p-4 flex-1 flex flex-col justify-center">
-      <FinancialAdd
-        v-bind="propsToPassFinancialaction"
-        @edit-done="handlerEmitEdit"
-        @add-done="handlerAddEdit"
-        @delete-done="removeFinancial(stateSideOver.id)"
-      />
-    </div>
-  </USlideover>
-  <div class="max-w-sm">
+    <UButton
+      v-if="!(isIncomesMode || isExpensesMode)"
+      @click="setIsOpenSideover(true, false)"
+      :label="`Додати ${isIncomesMode ? 'надходження' : 'витрати'}`"
+      variant="outline"
+      icon="i-heroicons-plus-circle"
+      class="mx-auto mb-2"
+    />
+
     <SubsciptionItem
       v-for="item in state.financialArray"
       :key="item.id"
@@ -254,8 +175,44 @@
       :category-id="item.categoryId"
       :currency-id="item.currencyId"
       @click="handleEditRow(item)"
+      class="even:bg-slate-50 dark:even:bg-slate-900"
     />
+
+    <div class="flex mt-4">
+      <UPagination
+        v-model="state.page"
+        :page-count="limitItems"
+        :total="state.totalItems"
+        class="mr-auto"
+      />
+      <USelect
+        v-model="state.selectedLimitItems"
+        :options="optionsLimitItems"
+        @change="fetchData"
+      />
+    </div>
   </div>
+  <USlideover v-model="isOpenSideover">
+    <div class="overflow-auto h-full">
+      <div class="flex items-center justify-end m-2">
+        <UButton
+          color="gray"
+          variant="ghost"
+          icon="i-heroicons-x-mark-20-solid"
+          @click="setIsOpenSideover(false, false)"
+        />
+      </div>
+      <div class="px-4 py-5 flex-1">
+        <FinancialAdd
+          :edit-mode="isEditFinancialAction"
+          :payload="stateSideOver"
+          @edit-done="editFinancial"
+          @create-done="createFinancial"
+          @delete-done="removeFinancial(stateSideOver.id)"
+        />
+      </div>
+    </div>
+  </USlideover>
 </template>
 
 <style scoped></style>

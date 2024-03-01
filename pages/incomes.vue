@@ -1,14 +1,14 @@
 <script setup lang="ts">
   import FinancialList from '~/components/Expenses/FinancialList.vue';
   import { FinancialModeEnum } from '~/enums/FinancialModeEnum';
+  import { FinancialModeKey } from '~/injectionKeys/FinancialModeKey';
 
-  const financialModeIncomes = FinancialModeEnum.Incomes;
-  provide('isIncomeFinancialMode', true);
+  provide(FinancialModeKey, FinancialModeEnum.Incomes);
 </script>
 
 <template>
   <h1 class="font-bold text-center text-xl mb-5">Надходження</h1>
-  <FinancialList :financial-mode="financialModeIncomes" />
+  <FinancialList />
 </template>
 
 <style scoped></style>

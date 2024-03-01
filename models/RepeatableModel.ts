@@ -9,7 +9,7 @@ export interface RepeatableModel {
   startDate: string;
   nextDepositDate: string;
   frequency: FrequencyEnum;
-  status?: StatusSubEnum;
+  status: StatusSubEnum;
   categoryId: string;
   currencyId: string;
 }

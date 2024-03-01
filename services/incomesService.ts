@@ -1,14 +1,17 @@
 import type { PaginatedCollectionResponse } from '~/models/PaginatedCollectionResponse';
 import type { IncomeModel } from '~/models/income/IncomeModel';
-import type { CreateIncomeRequest } from '~/models/income/CreateIncomeRequest';
+import type { FinancialCommonModel } from '~/models/FinancialCommonModel';
+import type { FinancialServiceInterface } from './FinancialServiceInterface';
+import { FrequencyEnum } from '~/enums/FrequencyEnum';
+import { StatusSubEnum } from '~/enums/StatusSubEnum';
 
-export function incomesService() {
-  function getIncomes(
+export function incomesService(): FinancialServiceInterface {
+  async function getFinancial(
     limit: number,
     offset: number,
     dateFrom: string,
     dateTo: string,
-  ): Promise<PaginatedCollectionResponse<IncomeModel>> {
+  ): Promise<PaginatedCollectionResponse<FinancialCommonModel>> {
     return $fetch('/api/Incomes', {
       method: 'get',
       query: {
@@ -17,52 +20,68 @@ export function incomesService() {
         dateFrom,
         dateTo,
       },
+    }).then((response) => {
+      const res = response as unknown as PaginatedCollectionResponse<IncomeModel>
+      const mappedData = res.data.map((item: IncomeModel) => mapToCommonModel(item));
+
+      return {
+        data: mappedData,
+        limit: res.limit,
+        offset: res.offset,
+        total: res.total,
+      };
     });
   }
-  async function postIncome(payload: CreateIncomeRequest) {
-    await $fetch('/api/Incomes', {
+  function postFinancial(payload: FinancialCommonModel) {
+    return $fetch('/api/Incomes', {
       method: 'post',
-      body: payload,
+      body: mapToSubModel(payload),
     })
-      .then(() => handlerThen('Додано'))
-      .catch(err => {
-        console.log(err);
-      });
   }
 
-  function changeIncome(payload: IncomeModel) {
-    const { id, notes, amount, taxAmount, date, categoryId, currencyId } = payload;
-    return $fetch(`/api/Incomes/${id}`, {
+  function changeFinancial(payload: FinancialCommonModel) {
+    return $fetch(`/api/Incomes/${payload.id}`, {
       method: 'put',
-      body: {
-        notes,
-        amount,
-        taxAmount,
-        date,
-        categoryId,
-        currencyId,
-      },
+      body: mapToSubModel(payload),
     });
   }
 
-  function deleteIncome(id: IncomeModel['id']) {
+  function deleteFinancial(id: FinancialCommonModel['id']) {
     return $fetch(`/api/Incomes/${id}`, {
       method: 'delete',
       body: {},
     });
   }
 
-  function handlerThen(text: string) {
-    useToast().add({
-      title: text,
-      timeout: 3000,
-    });
+  function mapToSubModel(item: FinancialCommonModel): IncomeModel {
+    return {
+      notes: item.text,
+      amount: item.value,
+      taxAmount: item.tax,
+      date: item.date,
+      categoryId: item.categoryId,
+      currencyId: item.currencyId
+    }
+  }
+  function mapToCommonModel(item: IncomeModel): FinancialCommonModel {
+    return {
+      id: item.id,
+      text: item.notes,
+      value: item.amount,
+      tax: item.taxAmount,
+      date: item.date,
+      anotherDate: '', // not used
+      frequency: FrequencyEnum.Weekly, // not used
+      status: StatusSubEnum.Active, // not used
+      categoryId: item.categoryId,
+      currencyId: item.currencyId
+    }
   }
 
   return {
-    getIncomes,
-    postIncome,
-    changeIncome,
-    deleteIncome,
+    getFinancial,
+    postFinancial,
+    changeFinancial,
+    deleteFinancial,
   };
 }

@@ -1,63 +1,84 @@
+import type { FinancialCommonModel } from '~/models/FinancialCommonModel';
 import type { PaginatedCollectionResponse } from '~/models/PaginatedCollectionResponse';
 import type { SubscriptionsModel } from '~/models/SubscriptionModel';
+import type { FinancialServiceInterface } from './FinancialServiceInterface';
 
-export function subscriptionsService() {
-  function getSubscriptions(
+export function subscriptionsService(): FinancialServiceInterface {
+  async function getFinancial(
     limit: number,
     offset: number,
-  ): Promise<PaginatedCollectionResponse<SubscriptionsModel>> {
+  ): Promise<PaginatedCollectionResponse<FinancialCommonModel>> {
     return $fetch('/api/Subscriptions', {
       method: 'get',
       query: {
         limit,
         offset,
       },
+    }).then((response) => {
+      const res = response as unknown as PaginatedCollectionResponse<SubscriptionsModel>
+      const mappedData = res.data.map((item: SubscriptionsModel) => mapToCommonModel(item));
+
+      return {
+        data: mappedData,
+        limit: res.limit,
+        offset: res.offset,
+        total: res.total,
+      };
     });
   }
 
-  async function postSubscriptions(payload: SubscriptionsModel) {
+  async function postFinancial(payload: FinancialCommonModel) {
     return $fetch('/api/Subscriptions', {
       method: 'post',
-      body: payload,
+      body: mapToSubModel(payload),
     });
   }
 
-  function changeSubscriptions(payload: SubscriptionsModel) {
-    const {
-      id,
-      name,
-      cost,
-      nextBillingDate,
-      frequency,
-      status,
-      categoryId,
-      currencyId,
-    } = payload;
-    return $fetch(`/api/Subscriptions/${id}`, {
+  function changeFinancial(payload: FinancialCommonModel) {
+    return $fetch(`/api/Subscriptions/${payload.id}`, {
       method: 'put',
-      body: {
-        name,
-        cost,
-        nextBillingDate,
-        frequency,
-        status,
-        categoryId,
-        currencyId,
-      },
+      body: mapToSubModel(payload),
     });
   }
 
-  function deleteSubscriptions(id: SubscriptionsModel['id']) {
+  function deleteFinancial(id: FinancialCommonModel['id']) {
     return $fetch(`/api/Subscriptions/${id}`, {
       method: 'delete',
       body: {},
     });
   }
 
+  function mapToSubModel(item: FinancialCommonModel): SubscriptionsModel {
+    return {
+      name: item.text,
+      cost: item.value,
+      startDate: item.date,
+      nextBillingDate: item.anotherDate,
+      frequency: item.frequency,
+      status: item.status,
+      categoryId: item.categoryId,
+      currencyId: item.currencyId
+    }
+  }
+  function mapToCommonModel(item: SubscriptionsModel): FinancialCommonModel {
+    return {
+      id: item.id,
+      text: item.name,
+      value: item.cost,
+      tax: 0,
+      date: item.startDate,
+      anotherDate: item.nextBillingDate,
+      frequency: item.frequency,
+      status: item.status,
+      categoryId: item.categoryId,
+      currencyId: item.currencyId
+    }
+  }
+
   return {
-    getSubscriptions,
-    postSubscriptions,
-    changeSubscriptions,
-    deleteSubscriptions,
+    getFinancial,
+    postFinancial,
+    changeFinancial,
+    deleteFinancial,
   };
 }

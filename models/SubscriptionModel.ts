@@ -5,10 +5,10 @@ export interface SubscriptionsModel {
   id?: string;
   name: string;
   cost: number;
-  startDate?: string;
+  startDate: string;
   nextBillingDate: string;
   frequency: FrequencyEnum;
-  status?: StatusSubEnum;
+  status: StatusSubEnum;
   categoryId: string;
   currencyId: string;
 }
