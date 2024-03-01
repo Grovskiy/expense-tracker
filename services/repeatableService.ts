@@ -1,28 +1,22 @@
-import type { ExpenseModel } from '~/models/expense/ExpenseModel';
 import type { PaginatedCollectionResponse } from '~/models/PaginatedCollectionResponse';
+import type { RepeatableModel } from '~/models/RepeatableModel';
 import type { FinancialServiceInterface } from './FinancialServiceInterface';
 import type { FinancialCommonModel } from '~/models/FinancialCommonModel';
-import { FrequencyEnum } from '~/enums/FrequencyEnum';
-import { StatusSubEnum } from '~/enums/StatusSubEnum';
 
-export function expensesService(): FinancialServiceInterface {
+export function repeatableService(): FinancialServiceInterface {
   async function getFinancial(
     limit: number,
     offset: number,
-    dateFrom: string,
-    dateTo: string,
   ): Promise<PaginatedCollectionResponse<FinancialCommonModel>> {
-    return $fetch('/api/Expenses', {
+    return $fetch('/api/RepeatableIncomes', {
       method: 'get',
       query: {
         limit,
         offset,
-        dateFrom,
-        dateTo,
       },
     }).then((response) => {
-      const res = response as unknown as PaginatedCollectionResponse<ExpenseModel>
-      const mappedData = res.data.map((item: ExpenseModel) => mapToCommonModel(item));
+      const res = response as unknown as PaginatedCollectionResponse<RepeatableModel>
+      const mappedData = res.data.map((item: RepeatableModel) => mapToCommonModel(item));
 
       return {
         data: mappedData,
@@ -34,45 +28,50 @@ export function expensesService(): FinancialServiceInterface {
   }
 
   function postFinancial(payload: FinancialCommonModel) {
-    return $fetch('/api/Expenses', {
+    return $fetch('/api/RepeatableIncomes', {
       method: 'post',
       body: mapToSubModel(payload),
     });
   }
 
   function changeFinancial(payload: FinancialCommonModel) {
-    return $fetch(`/api/Expenses/${payload.id}`, {
+    return $fetch(`/api/RepeatableIncomes/${payload.id}`, {
       method: 'put',
       body: mapToSubModel(payload),
     });
   }
 
-  function deleteFinancial(id: FinancialCommonModel['id']) {
-    return $fetch(`/api/Expenses/${id}`, {
+  function deleteFinancial(id: RepeatableModel['id']) {
+    return $fetch(`/api/RepeatableIncomes/${id}`, {
       method: 'delete',
       body: {},
     });
   }
 
-  function mapToSubModel(item: FinancialCommonModel): ExpenseModel {
+  function mapToSubModel(item: FinancialCommonModel): RepeatableModel {
     return {
-      notes: item.text,
-      cost: item.value,
-      date: item.date,
+      name: item.text,
+      amount: item.value,
+      taxAmount: item.tax,
+      startDate: item.date,
+      nextDepositDate: item.anotherDate,
+      frequency: item.frequency,
+      status: item.status,
       categoryId: item.categoryId,
       currencyId: item.currencyId
     }
   }
-  function mapToCommonModel(item: ExpenseModel): FinancialCommonModel {
+
+  function mapToCommonModel(item: RepeatableModel): FinancialCommonModel {
     return {
       id: item.id,
-      text: item.notes,
-      value: item.cost,
-      tax: 0,
-      date: item.date,
-      anotherDate: '', // not used
-      frequency: FrequencyEnum.Weekly, // not used
-      status: StatusSubEnum.Active, // not used
+      text: item.name,
+      value: item.amount,
+      tax: item.taxAmount,
+      date: item.startDate,
+      anotherDate: item.nextDepositDate,
+      frequency: item.frequency,
+      status: item.status,
       categoryId: item.categoryId,
       currencyId: item.currencyId
     }

@@ -2,8 +2,10 @@
   import { useCategoriesStore } from '~/store/categories';
   import { storeToRefs } from 'pinia';
   import type { CategoryFamilyInterface } from '~/interfaces/CategoryFamilyInterface';
+  import { FinancialModeKey } from '~/injectionKeys/FinancialModeKey';
+  import { FinancialModeEnum } from '~/enums/FinancialModeEnum';
 
-  const isIncomeFinancialMode = inject('isIncomeFinancialMode');
+  const injectedFinancialMode = inject(FinancialModeKey);
 
   const props = defineProps({
     categoryId: { default: '', type: String, required: false },
@@ -14,7 +16,8 @@
     storeToRefs(categoriesStore);
 
   const formattedCategories = computed(() => {
-    return isIncomeFinancialMode
+    return injectedFinancialMode === FinancialModeEnum.Incomes ||
+      injectedFinancialMode === FinancialModeEnum.RepeatableIncomes
       ? familyCategoriesIncome.value
       : familyCategoriesExpense.value;
   });

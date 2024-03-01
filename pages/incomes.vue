@@ -1,7 +1,9 @@
 <script setup lang="ts">
   import FinancialList from '~/components/Expenses/FinancialList.vue';
+  import { FinancialModeEnum } from '~/enums/FinancialModeEnum';
+  import { FinancialModeKey } from '~/injectionKeys/FinancialModeKey';
 
-  provide('isIncomeFinancialMode', true);
+  provide(FinancialModeKey, FinancialModeEnum.Incomes);
 </script>
 
 <template>

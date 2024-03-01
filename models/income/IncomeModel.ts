@@ -1,5 +1,5 @@
 export interface IncomeModel {
-  id: string;
+  id?: string;
   notes: string;
   amount: number;
   taxAmount: number;

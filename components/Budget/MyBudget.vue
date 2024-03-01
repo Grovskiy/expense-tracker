@@ -8,7 +8,7 @@
   const { currencies } = storeToRefs(useCurrenciesStore());
 
   const chosenDate = ref({
-    start: dayjs().add(-2, 'day').utc().format(),
+    start: dayjs().add(-30, 'day').utc().format(),
     end: dayjs().utc().format(),
   });
 

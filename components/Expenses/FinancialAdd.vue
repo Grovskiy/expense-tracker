@@ -1,53 +1,64 @@
 <script setup lang="ts">
-  import { expensesService } from '~/services/expensesService';
   import type { CategoryFamilyInterface } from '~/interfaces/CategoryFamilyInterface';
   import type { CurrenciesInterface } from '~/interfaces/CurrenciesInterface';
-  import type { CreateExpenseRequest } from '~/models/expense/CreateExpenseRequest';
-  import type { CreateIncomeRequest } from '~/models/income/CreateIncomeRequest';
-  import { incomesService } from '~/services/incomesService';
+  import type { FinancialCommonModel } from '~/models/FinancialCommonModel';
+  import { FinancialModeEnum } from '~/enums/FinancialModeEnum';
+  import { StatusSubEnum } from '~/enums/StatusSubEnum';
+  import { FrequencyEnum } from '~/enums/FrequencyEnum';
+  import { FinancialModeKey } from '~/injectionKeys/FinancialModeKey';
+  import { useCurrenciesStore } from '~/store/currencies';
 
-  const isIncomeFinancialMode = inject('isIncomeFinancialMode');
+  const { currencies } = storeToRefs(useCurrenciesStore());
 
-  const props = defineProps({
-    editMode: {
-      default: false,
-      type: Boolean,
-      required: false,
-    },
-    id: { default: '', type: String, required: false },
-    notes: { default: '', type: String, required: false },
-    value: { default: undefined, type: Number || undefined, required: false },
-    tax: { default: undefined, type: Number || undefined, required: false },
-    date: { default: '', type: String, required: false },
-    categoryId: { default: '', type: String, required: false },
-    currencyId: { default: '', type: String, required: false },
-  });
+  const injectedFinancialMode = inject(FinancialModeKey);
 
-  const state = reactive({
-    value: undefined,
-    tax: undefined,
-    notes: '',
+  const dayjs = useDayjs();
+
+  const props = defineProps<{
+    editMode: boolean;
+    payload: FinancialCommonModel;
+  }>();
+
+  const state: Ref<FinancialCommonModel> = ref({
+    id: '',
+    value: 0,
+    tax: 0,
+    text: '',
+    date: dayjs().utc().format(),
+    anotherDate: dayjs().add(30, 'day').utc().format(),
+    frequency: FrequencyEnum.Weekly,
+    status: StatusSubEnum.Active,
     categoryId: '',
     currencyId: '',
   });
 
+  const frequencyOptions = Object.values(FrequencyEnum);
+  const statusOptions = Object.values(StatusSubEnum);
+
+  const currentCurrency = computed(() => {
+    return currencies.value.filter(
+      item => item.id === state.value.currencyId,
+    )[0]?.code;
+  });
+  const isRepeatableExpenses = computed(() => {
+    return injectedFinancialMode === FinancialModeEnum.RepeatableExpenses;
+  });
+  const isRepeatableIncomes = computed(() => {
+    return injectedFinancialMode === FinancialModeEnum.RepeatableIncomes;
+  });
+  const isIncomes = computed(() => {
+    return injectedFinancialMode === FinancialModeEnum.Incomes;
+  });
+
   onMounted(() => {
-    if (props.editMode) {
-      state.value = props.value;
-      state.tax = props.tax;
-      state.notes = props.notes;
-      state.date = useDayjs(props.date).utc().format();
-      state.categoryId = props.categoryId;
-      state.currencyId = props.currencyId;
-    }
+    if (props.editMode) state.value = props.payload;
   });
 
   const emit = defineEmits<{
-    editDone: [value: object];
-    addDone: [];
+    editDone: [value: FinancialCommonModel];
+    createDone: [value: FinancialCommonModel];
     deleteDone: [];
   }>();
-  // const emit = defineEmits(['editDone', 'addDone']);
 
   const validate = (state: { value: number }) => {
     const errors = [];
@@ -56,43 +67,31 @@
     return errors;
   };
   async function onSubmit() {
-    if (!props.editMode) return postFinancial();
-    emit('editDone', { id: props.id, ...state });
+    if (props.editMode) {
+      emit('editDone', state.value);
+    } else {
+      emit('createDone', state.value);
+    }
   }
-  async function postFinancial() {
-    const date = useDayjs().utc().format();
-    const payloadExpense: CreateExpenseRequest = {
-      date,
-      cost: state.value,
-      notes: state.notes,
-      categoryId: state.categoryId,
-      currencyId: state.currencyId,
-    };
-    const payloadIncome: CreateIncomeRequest = {
-      date,
-      amount: state.value,
-      taxAmount: state.tax,
-      notes: state.notes,
-      categoryId: state.categoryId,
-      currencyId: state.currencyId,
-    };
-    isIncomeFinancialMode
-      ? await incomesService()
-          .postIncome(payloadIncome)
-          .then(() => emit('addDone'))
-      : await expensesService()
-          .postExpense(payloadExpense)
-          .then(() => emit('addDone'));
-    state.value = undefined;
-    state.tax = undefined;
-    state.notes = '';
-  }
+
   function handlerCategories(value: CategoryFamilyInterface) {
-    state.categoryId = value?.id;
+    state.value.categoryId = value?.id;
   }
   function handlerCurrencies(value: CurrenciesInterface) {
-    state.currencyId = value.id;
+    state.value.currencyId = value.id;
   }
+  const anotherDateLabel = () => {
+    const mapDateLabel = {
+      [FinancialModeEnum.Expenses]: '',
+      [FinancialModeEnum.Incomes]: '',
+      [FinancialModeEnum.RepeatableIncomes]: 'Наступна дата вкладу',
+      [FinancialModeEnum.RepeatableExpenses]:
+        'Наступна дата виставлення рахунку',
+    };
+    return injectedFinancialMode
+      ? mapDateLabel[injectedFinancialMode]
+      : 'Another date';
+  };
 </script>
 
 <template>
@@ -105,31 +104,81 @@
     class="flex flex-col space-y-3"
     @submit="onSubmit"
   >
-    <UFormGroup label="Сума" name="value">
-      <UInput placeholder="1 200" v-model="state.value" type="number" />
+    <div :class="{ 'flex space-x-4': isIncomes || isRepeatableIncomes }">
+      <UFormGroup label="Сума" name="value">
+        <UInput placeholder="1 200" v-model="state.value" type="number">
+          <template #trailing>
+            <span class="text-gray-500 dark:text-gray-400 text-xs">{{
+              currentCurrency
+            }}</span>
+          </template>
+        </UInput>
+      </UFormGroup>
+      <UFormGroup
+        v-if="isIncomes || isRepeatableIncomes"
+        label="Податок"
+        name="tax"
+      >
+        <UInput placeholder="Податок" v-model="state.tax" type="number">
+          <template #trailing>
+            <span class="text-gray-500 dark:text-gray-400 text-xs">%</span>
+          </template>
+        </UInput>
+      </UFormGroup>
+    </div>
+    <UFormGroup label="Валюта" name="currencies">
+      <CurrenciesList
+        :currency-id="props.payload.currencyId"
+        @update="handlerCurrencies"
+      />
     </UFormGroup>
-    <UFormGroup label="Податок" v-if="isIncomeFinancialMode" name="tax">
-      <UInput placeholder="Податок" v-model="state.tax" type="number" />
-    </UFormGroup>
-    <UFormGroup label="Нотатка" name="notes">
+    <UFormGroup label="Нотатка" name="text">
       <UInput
         placeholder="Продукти та кока кола..."
-        v-model="state.notes"
+        v-model="state.text"
         type="text"
       />
     </UFormGroup>
     <UFormGroup label="Категорія" name="categories">
       <CategoriesFamilyList
-        :category-id="props.categoryId"
+        :category-id="props.payload.categoryId"
         @update="handlerCategories"
       />
     </UFormGroup>
-    <UFormGroup label="Валюта" name="currencies">
-      <CurrenciesList
-        :currency-id="props.currencyId"
-        @update="handlerCurrencies"
-      />
-    </UFormGroup>
+    <div class="flex space-x-4">
+      <UFormGroup label="Дата">
+        <DatePicker v-model="state.date" />
+      </UFormGroup>
+      <UFormGroup
+        v-if="isRepeatableIncomes || isRepeatableExpenses"
+        :label="anotherDateLabel()"
+      >
+        <DatePicker v-model="state.anotherDate" />
+      </UFormGroup>
+    </div>
+
+    <div
+      v-if="isRepeatableIncomes || isRepeatableExpenses"
+      class="flex space-x-4"
+    >
+      <UFormGroup label="Frequency" name="frequency">
+        <USelectMenu
+          v-model="state.frequency"
+          :options="frequencyOptions"
+          class="h-8"
+        >
+        </USelectMenu>
+      </UFormGroup>
+      <UFormGroup label="Status" name="status">
+        <USelectMenu
+          v-model="state.status"
+          :options="statusOptions"
+          class="h-8"
+        >
+        </USelectMenu>
+      </UFormGroup>
+    </div>
+
     <div class="flex justify-between space-x-2">
       <UButton type="submit" label="Готово" />
       <UButton
