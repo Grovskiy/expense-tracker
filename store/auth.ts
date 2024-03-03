@@ -7,7 +7,6 @@ import type { UserTokensInterface } from '~/interfaces/UserTokensInterface';
 
 import { useCurrenciesStore } from '~/store/currencies';
 import { useCategoriesStore } from '~/store/categories';
-import { useTriggerRequests } from '~/store/triggerRequests';
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
@@ -38,25 +37,12 @@ export const useAuthStore = defineStore('auth', {
         const { accessToken, refreshToken } = res as UserTokensInterface;
         if (accessToken && refreshToken) {
           this.setAuthenticated({ accessToken, refreshToken });
-          useTriggerRequests().triggerRequests();
         }
       }
     },
     handleError(err: IFetchError) {
       throw err.data;
     },
-    // async goRefreshTokens(
-    //   accessToken: UserTokensInterface,
-    //   refreshToken: UserTokensInterface,
-    // ): Promise<void> {
-    //   console.log('goRefreshTokens', accessToken, refreshToken);
-    //   await $fetch('/api/auth/refresh-token', {
-    //     method: 'post',
-    //     body: {
-    //       accessToken: accessToken,
-    //       refreshToken: refreshToken,
-    //     },
-    //   })
     logUserOut() {
       this.setAuthenticated({ accessToken: null, refreshToken: null });
 

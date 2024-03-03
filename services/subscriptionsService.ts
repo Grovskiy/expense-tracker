@@ -1,22 +1,25 @@
 import type { FinancialCommonModel } from '~/models/FinancialCommonModel';
 import type { PaginatedCollectionResponse } from '~/models/PaginatedCollectionResponse';
 import type { SubscriptionsModel } from '~/models/SubscriptionModel';
-import type { FinancialServiceInterface } from './FinancialServiceInterface';
+import type { FinancialServiceInterface } from '../models/FinancialServiceInterface';
 
 export function subscriptionsService(): FinancialServiceInterface {
   async function getFinancial(
     limit: number,
     offset: number,
   ): Promise<PaginatedCollectionResponse<FinancialCommonModel>> {
-    return $fetch('/api/Subscriptions', {
+    return request('/api/Subscriptions', {
       method: 'get',
       query: {
         limit,
         offset,
       },
-    }).then((response) => {
-      const res = response as unknown as PaginatedCollectionResponse<SubscriptionsModel>
-      const mappedData = res.data.map((item: SubscriptionsModel) => mapToCommonModel(item));
+    }).then(response => {
+      const res =
+        response as unknown as PaginatedCollectionResponse<SubscriptionsModel>;
+      const mappedData = res.data.map((item: SubscriptionsModel) =>
+        mapToCommonModel(item),
+      );
 
       return {
         data: mappedData,
@@ -28,21 +31,21 @@ export function subscriptionsService(): FinancialServiceInterface {
   }
 
   async function postFinancial(payload: FinancialCommonModel) {
-    return $fetch('/api/Subscriptions', {
+    return request('/api/Subscriptions', {
       method: 'post',
       body: mapToSubModel(payload),
     });
   }
 
   function changeFinancial(payload: FinancialCommonModel) {
-    return $fetch(`/api/Subscriptions/${payload.id}`, {
+    return request(`/api/Subscriptions/${payload.id}`, {
       method: 'put',
       body: mapToSubModel(payload),
     });
   }
 
   function deleteFinancial(id: FinancialCommonModel['id']) {
-    return $fetch(`/api/Subscriptions/${id}`, {
+    return request(`/api/Subscriptions/${id}`, {
       method: 'delete',
       body: {},
     });
@@ -57,8 +60,8 @@ export function subscriptionsService(): FinancialServiceInterface {
       frequency: item.frequency,
       status: item.status,
       categoryId: item.categoryId,
-      currencyId: item.currencyId
-    }
+      currencyId: item.currencyId,
+    };
   }
   function mapToCommonModel(item: SubscriptionsModel): FinancialCommonModel {
     return {
@@ -71,8 +74,8 @@ export function subscriptionsService(): FinancialServiceInterface {
       frequency: item.frequency,
       status: item.status,
       categoryId: item.categoryId,
-      currencyId: item.currencyId
-    }
+      currencyId: item.currencyId,
+    };
   }
 
   return {

@@ -14,14 +14,18 @@ export const useCurrenciesStore = defineStore('currencies', {
     loaded: false as boolean,
   }),
   actions: {
-    async getCurrencies() {
-      if (this.loaded) return;
-      await $fetch('/api/Currencies', {
-        method: 'get',
-      }).then(res => {
-        this.currencies = res as CurrenciesInterface[];
-        this.loaded = true;
-      });
+    // async getCurrencies() {
+    //   if (this.loaded) return;
+    //   await $fetch('/api/Currencies', {
+    //     method: 'get',
+    //   }).then(res => {
+    //     this.currencies = res as CurrenciesInterface[];
+    //     this.loaded = true;
+    //   });
+    // },
+    setCurrencies(array: CurrenciesInterface[]) {
+      this.currencies = array;
+      this.loaded = true;
     },
   },
 });

@@ -1,6 +1,6 @@
 import type { PaginatedCollectionResponse } from '~/models/PaginatedCollectionResponse';
 import type { RepeatableModel } from '~/models/RepeatableModel';
-import type { FinancialServiceInterface } from './FinancialServiceInterface';
+import type { FinancialServiceInterface } from '../models/FinancialServiceInterface';
 import type { FinancialCommonModel } from '~/models/FinancialCommonModel';
 
 export function repeatableService(): FinancialServiceInterface {
@@ -8,15 +8,18 @@ export function repeatableService(): FinancialServiceInterface {
     limit: number,
     offset: number,
   ): Promise<PaginatedCollectionResponse<FinancialCommonModel>> {
-    return $fetch('/api/RepeatableIncomes', {
+    return request('/api/RepeatableIncomes', {
       method: 'get',
       query: {
         limit,
         offset,
       },
-    }).then((response) => {
-      const res = response as unknown as PaginatedCollectionResponse<RepeatableModel>
-      const mappedData = res.data.map((item: RepeatableModel) => mapToCommonModel(item));
+    }).then(response => {
+      const res =
+        response as unknown as PaginatedCollectionResponse<RepeatableModel>;
+      const mappedData = res.data.map((item: RepeatableModel) =>
+        mapToCommonModel(item),
+      );
 
       return {
         data: mappedData,
@@ -28,21 +31,21 @@ export function repeatableService(): FinancialServiceInterface {
   }
 
   function postFinancial(payload: FinancialCommonModel) {
-    return $fetch('/api/RepeatableIncomes', {
+    return request('/api/RepeatableIncomes', {
       method: 'post',
       body: mapToSubModel(payload),
     });
   }
 
   function changeFinancial(payload: FinancialCommonModel) {
-    return $fetch(`/api/RepeatableIncomes/${payload.id}`, {
+    return request(`/api/RepeatableIncomes/${payload.id}`, {
       method: 'put',
       body: mapToSubModel(payload),
     });
   }
 
   function deleteFinancial(id: RepeatableModel['id']) {
-    return $fetch(`/api/RepeatableIncomes/${id}`, {
+    return request(`/api/RepeatableIncomes/${id}`, {
       method: 'delete',
       body: {},
     });
@@ -58,8 +61,8 @@ export function repeatableService(): FinancialServiceInterface {
       frequency: item.frequency,
       status: item.status,
       categoryId: item.categoryId,
-      currencyId: item.currencyId
-    }
+      currencyId: item.currencyId,
+    };
   }
 
   function mapToCommonModel(item: RepeatableModel): FinancialCommonModel {
@@ -73,8 +76,8 @@ export function repeatableService(): FinancialServiceInterface {
       frequency: item.frequency,
       status: item.status,
       categoryId: item.categoryId,
-      currencyId: item.currencyId
-    }
+      currencyId: item.currencyId,
+    };
   }
 
   return {

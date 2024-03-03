@@ -8,8 +8,10 @@
         "generate": "nuxt generate",
         "preview": "nuxt preview",
         "postinstall": "nuxt prepare",
-        "lint-show": "eslint --ext .js,.vue .",
-        "lint-fix": "eslint --ext .js,.vue . --fix"
+        "deploy": "gh-pages -d .output/public --repo https://github.com/Grovskiy/expense-tracker.git",
+        "lint-show": "eslint --ext .ts,.vue .",
+        "lint-fix": "eslint --ext .ts,.vue . --fix",
+        "prettier-format": "prettier --config .prettierrc '**/*.ts' --write"
     },
     "devDependencies": {
         "@nuxt/devtools": "latest",
@@ -19,6 +21,7 @@
         "eslint": "^8.56.0",
         "eslint-config-prettier": "^9.1.0",
         "eslint-plugin-vue": "^9.19.2",
+        "gh-pages": "^6.1.1",
         "nuxt": "^3.8.2",
         "nuxt-typed-router": "^3.5.0",
         "prettier": "3.1.1",

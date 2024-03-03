@@ -17,6 +17,7 @@
   const props = defineProps<{
     editMode: boolean;
     payload: FinancialCommonModel;
+    isLoading: boolean;
   }>();
 
   const state: Ref<FinancialCommonModel> = ref({
@@ -180,12 +181,13 @@
     </div>
 
     <div class="flex justify-between space-x-2">
-      <UButton type="submit" label="Готово" />
+      <UButton type="submit" label="Готово" :loading="props.isLoading" />
       <UButton
         v-if="props.editMode"
         label="Видалити"
         color="rose"
         variant="ghost"
+        :loading="props.isLoading"
         @click="emit('deleteDone')"
       />
     </div>

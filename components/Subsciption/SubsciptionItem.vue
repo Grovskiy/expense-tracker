@@ -9,8 +9,6 @@
   const { currencies } = storeToRefs(useCurrenciesStore());
 
   const props = defineProps<{
-    id?: string;
-
     text: string; // name | notes
 
     value: number; // amount | cost
@@ -43,7 +41,7 @@
 
 <template>
   <div
-    class="flex gap-2 items-center text-sm text-current p-1 hover:bg-slate-200 cursor-pointer"
+    class="flex gap-2 items-center text-md text-current p-1 py-2 hover:bg-slate-200 cursor-pointer"
     @click="emit('click')"
   >
     <UBadge

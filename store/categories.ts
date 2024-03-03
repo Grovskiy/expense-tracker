@@ -53,6 +53,10 @@ export const useCategoriesStore = defineStore('categories', {
         this.familyLoaded = true;
       });
     },
+    setFamilyCategories(array: CategoryFamilyInterface[]) {
+      this.familyCategories = array;
+      this.familyLoaded = true;
+    },
     async postCategories(payload: CategoryPayloadInterface) {
       // create category or subcategory
       await $fetch('/api/Categories', {

@@ -6,7 +6,7 @@ export function budgetService() {
     dateTo: string,
     currencyId: string,
   ): Promise<BudgetSummuryModel> {
-    return $fetch('/api/Budget/summary', {
+    return request<BudgetSummuryModel>('/api/Budget/summary', {
       method: 'get',
       query: {
         dateFrom,

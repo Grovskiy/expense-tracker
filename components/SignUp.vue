@@ -27,17 +27,21 @@
   type Schema = InferType<typeof schema>;
 
   const state = reactive({
-    firstName: 'John', // undefined
-    lastName: 'Smith', // undefined
-    email: 'test1@test.com', // undefined
-    password: 'test1@test.com', // undefined
+    firstName: undefined,
+    lastName: undefined,
+    email: undefined,
+    password: undefined,
     defaultCategories: [],
   });
   const form = ref();
+  const isLoading = ref();
 
   async function onSubmit(event: FormSubmitEvent<Schema>) {
     try {
+      isLoading.value = true;
       await authSignUp(event.data);
+      firstLogin();
+      if (authenticated.value) await router.push('/');
     } catch (e) {
       if (e && typeof e === 'object') {
         const err = e as IFetchError['data'];
@@ -49,8 +53,9 @@
           );
         }
       }
+    } finally {
+      isLoading.value = false;
     }
-    if (authenticated.value) await router.push('/');
   }
 
   onMounted(() => {
@@ -67,19 +72,19 @@
       ref="form"
       :schema="schema"
       :state="state"
-      class="space-y-4"
+      class="space-y-3"
       @submit="onSubmit"
     >
       <UFormGroup label="First name" name="firstName">
-        <UInput v-model="state.firstName" />
+        <UInput v-model="state.firstName" placeholder="John" />
       </UFormGroup>
 
       <UFormGroup label="Last name" name="lastName">
-        <UInput v-model="state.lastName" />
+        <UInput v-model="state.lastName" placeholder="Smith" />
       </UFormGroup>
 
       <UFormGroup label="Email" name="email">
-        <UInput v-model="state.email" />
+        <UInput v-model="state.email" placeholder="someone@example.com" />
       </UFormGroup>
 
       <UFormGroup label="Categories" name="defaultCategories">
@@ -87,7 +92,11 @@
       </UFormGroup>
 
       <UFormGroup label="Password" name="password">
-        <UInput v-model="state.password" type="password" />
+        <UInput
+          v-model="state.password"
+          type="password"
+          placeholder="qwerty***"
+        />
       </UFormGroup>
 
       <UButton block type="submit"> Sign up </UButton>

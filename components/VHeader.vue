@@ -50,9 +50,13 @@
 <template>
   <header>
     <UContainer class="flex mt-2">
-      <UIcon
-        class="text-3xl text-gray-700 dark:text-gray-200 mr-2"
-        name="i-heroicons-presentation-chart-line"
+      <UButton
+        class="text-3xl text-gray-700 dark:text-gray-200 mr-4"
+        icon="i-heroicons-presentation-chart-line"
+        size="md"
+        color="primary"
+        variant="outline"
+        @click="pushToRoute('/')"
       />
       <div
         class="text-sm flex items-center w-full child:mr-3 child:flex child:items-center"
@@ -87,11 +91,11 @@
                   @click="isOpen = false"
                 />
               </div>
-              <div class="flex flex-col items-center space-y-3">
+              <div class="flex flex-col space-y-3">
                 <UButton
                   v-for="(item, index) in menuItems"
                   :key="index"
-                  size="sm"
+                  size="md"
                   color="primary"
                   variant="outline"
                   :label="item.label"
@@ -101,7 +105,7 @@
                 <UButton
                   v-if="authenticated"
                   icon="i-heroicons-arrow-left-on-rectangle"
-                  size="sm"
+                  size="md"
                   color="rose"
                   variant="outline"
                   label="Sign out"

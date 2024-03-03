@@ -1,6 +1,6 @@
 import type { ExpenseModel } from '~/models/expense/ExpenseModel';
 import type { PaginatedCollectionResponse } from '~/models/PaginatedCollectionResponse';
-import type { FinancialServiceInterface } from './FinancialServiceInterface';
+import type { FinancialServiceInterface } from '../models/FinancialServiceInterface';
 import type { FinancialCommonModel } from '~/models/FinancialCommonModel';
 import { FrequencyEnum } from '~/enums/FrequencyEnum';
 import { StatusSubEnum } from '~/enums/StatusSubEnum';
@@ -12,7 +12,7 @@ export function expensesService(): FinancialServiceInterface {
     dateFrom: string,
     dateTo: string,
   ): Promise<PaginatedCollectionResponse<FinancialCommonModel>> {
-    return $fetch('/api/Expenses', {
+    return request('/api/Expenses', {
       method: 'get',
       query: {
         limit,
@@ -20,9 +20,12 @@ export function expensesService(): FinancialServiceInterface {
         dateFrom,
         dateTo,
       },
-    }).then((response) => {
-      const res = response as unknown as PaginatedCollectionResponse<ExpenseModel>
-      const mappedData = res.data.map((item: ExpenseModel) => mapToCommonModel(item));
+    }).then(response => {
+      const res =
+        response as unknown as PaginatedCollectionResponse<ExpenseModel>;
+      const mappedData = res.data.map((item: ExpenseModel) =>
+        mapToCommonModel(item),
+      );
 
       return {
         data: mappedData,
@@ -34,21 +37,21 @@ export function expensesService(): FinancialServiceInterface {
   }
 
   function postFinancial(payload: FinancialCommonModel) {
-    return $fetch('/api/Expenses', {
+    return request('/api/Expenses', {
       method: 'post',
       body: mapToSubModel(payload),
     });
   }
 
   function changeFinancial(payload: FinancialCommonModel) {
-    return $fetch(`/api/Expenses/${payload.id}`, {
+    return request(`/api/Expenses/${payload.id}`, {
       method: 'put',
       body: mapToSubModel(payload),
     });
   }
 
   function deleteFinancial(id: FinancialCommonModel['id']) {
-    return $fetch(`/api/Expenses/${id}`, {
+    return request(`/api/Expenses/${id}`, {
       method: 'delete',
       body: {},
     });
@@ -60,8 +63,8 @@ export function expensesService(): FinancialServiceInterface {
       cost: item.value,
       date: item.date,
       categoryId: item.categoryId,
-      currencyId: item.currencyId
-    }
+      currencyId: item.currencyId,
+    };
   }
   function mapToCommonModel(item: ExpenseModel): FinancialCommonModel {
     return {
@@ -74,8 +77,8 @@ export function expensesService(): FinancialServiceInterface {
       frequency: FrequencyEnum.Weekly, // not used
       status: StatusSubEnum.Active, // not used
       categoryId: item.categoryId,
-      currencyId: item.currencyId
-    }
+      currencyId: item.currencyId,
+    };
   }
 
   return {
