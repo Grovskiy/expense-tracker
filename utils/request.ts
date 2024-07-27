@@ -8,11 +8,18 @@ const fetcher = ofetch.create({
   baseURL: runtimeConfig.public.baseUrl,
   async onRequest({ options }) {
     const accessToken = useCookie('token').value;
+    const groupCurrentId = useCookie('groupCurrentId').value;
 
     if (accessToken) {
       options.headers = {
         ...options.headers,
         Authorization: `Bearer ${accessToken}`,
+      };
+    }
+    if (groupCurrentId) {
+      options.headers = {
+        ...options.headers,
+        GroupId: groupCurrentId,
       };
     }
   },

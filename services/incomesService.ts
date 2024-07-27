@@ -56,7 +56,7 @@ export function incomesService(): FinancialServiceInterface {
     });
   }
 
-  function mapToSubModel(item: FinancialCommonModel): IncomeModel {
+  function mapToSubModel(item: FinancialCommonModel) {
     return {
       notes: item.text,
       amount: item.value,
@@ -76,8 +76,8 @@ export function incomesService(): FinancialServiceInterface {
       anotherDate: '', // not used
       frequency: FrequencyEnum.Weekly, // not used
       status: StatusSubEnum.Active, // not used
-      categoryId: item.categoryId,
-      currencyId: item.currencyId,
+      categoryId: item.category.id,
+      currencyId: item.currency.id,
     };
   }
 

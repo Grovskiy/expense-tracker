@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia';
 import type { CategoryDefaultInterface } from '~/interfaces/CategoryDefaultInterface';
 import type { CategoryFamilyInterface } from '~/interfaces/CategoryFamilyInterface';
-import type { CategoryPayloadInterface } from '~/interfaces/CategoryPayloadInterface';
 import { CategoryTypeEnum } from '~/enums/CategoryTypeEnum';
 import type { IFetchError } from 'ofetch';
 
@@ -56,46 +55,6 @@ export const useCategoriesStore = defineStore('categories', {
     setFamilyCategories(array: CategoryFamilyInterface[]) {
       this.familyCategories = array;
       this.familyLoaded = true;
-    },
-    async postCategories(payload: CategoryPayloadInterface) {
-      // create category or subcategory
-      await $fetch('/api/Categories', {
-        method: 'post',
-        body: payload,
-      })
-        .then(() => this.handlerThen('Створено категорію'))
-        .catch(err => this.handlerErr(err));
-    },
-    async putCategories(
-      id: CategoryFamilyInterface['id'],
-      name: CategoryFamilyInterface['name'],
-    ) {
-      // update name category
-      await $fetch(`/api/Categories/${id}`, {
-        method: 'put',
-        body: {
-          name,
-        },
-      })
-        .then(() => this.handlerThen('Назву змінено'))
-        .catch(err => this.handlerErr(err));
-    },
-    async deleteCategories(id: CategoryFamilyInterface['id']) {
-      // delete category
-      await $fetch(`/api/Categories/${id}`, {
-        method: 'delete',
-        body: {},
-      })
-        .then(() => this.handlerThen('Категорію видалено'))
-        .catch(err => this.handlerErr(err));
-    },
-    handlerThen(text: string) {
-      this.familyLoaded = false;
-      this.getFamilyCategories();
-      useToast().add({
-        title: text,
-        timeout: 2000,
-      });
     },
     handlerErr(err: IFetchError) {
       useToast().add({

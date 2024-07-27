@@ -3,8 +3,10 @@
   import { CategoryTypeEnum } from '~/enums/CategoryTypeEnum';
   import type { CategoryPayloadInterface } from '~/interfaces/CategoryPayloadInterface';
   import { useCategoriesStore } from '~/store/categories';
+  import { request } from '~/utils/request';
+  import { categoriesService } from '~/services/categoriesService';
 
-  const { postCategories } = useCategoriesStore();
+  const { handlerErr } = useCategoriesStore();
 
   const options = [
     { value: CategoryTypeEnum.Expense, label: 'Витрати' },
@@ -24,11 +26,18 @@
   };
 
   async function onSubmit(event: FormSubmitEvent<CategoryPayloadInterface>) {
-    await postCategories({
+    const payload = {
       name: event.data.name,
       type: event.data.type,
       parentCategoryId: null,
-    });
+    };
+    await request('/api/Categories', {
+      method: 'post',
+      body: payload,
+    })
+      .then(() => categoriesService().handlerThenCategory('Створено категорію'))
+      .catch(err => handlerErr(err));
+
     state.name = '';
   }
 </script>

@@ -1,5 +1,6 @@
 <script setup lang="ts">
   import { useAuthStore } from '~/store/auth';
+  import { storeToRefs } from 'pinia';
 
   const router = useRouter();
 
@@ -92,16 +93,15 @@
                 />
               </div>
               <div class="flex flex-col space-y-3">
-                <UButton
-                  v-for="(item, index) in menuItems"
-                  :key="index"
-                  size="md"
-                  color="primary"
-                  variant="outline"
-                  :label="item.label"
-                  :trailing="false"
+                <ULink
+                  v-for="(item, index) in menuItems" :key="index"
+                  :to="item.path"
+                  :active-class="activeClass"
+                  :inactive-class="inactiveClass"
                   @click="pushToRoute(item.path)"
-                />
+                >
+                  {{ item.label }}
+                </ULink>
                 <UButton
                   v-if="authenticated"
                   icon="i-heroicons-arrow-left-on-rectangle"

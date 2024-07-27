@@ -9,7 +9,7 @@ export function categoriesService() {
   async function getFamilyCategories() {
     if (familyLoaded.value) return;
 
-    await request('/api/Categories/get-family-categories', {
+    await request('/api/Categories/get-group-categories', {
       method: 'get',
     }).then(res => {
       const response = res as CategoryFamilyInterface[];
@@ -17,7 +17,17 @@ export function categoriesService() {
     });
   }
 
+  function handlerThenCategory(text: string) {
+    familyLoaded.value = false;
+    getFamilyCategories();
+    useToast().add({
+      title: text,
+      timeout: 2000,
+    });
+  }
+
   return {
     getFamilyCategories,
+    handlerThenCategory,
   };
 }

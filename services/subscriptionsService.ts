@@ -1,7 +1,7 @@
 import type { FinancialCommonModel } from '~/models/FinancialCommonModel';
 import type { PaginatedCollectionResponse } from '~/models/PaginatedCollectionResponse';
 import type { SubscriptionsModel } from '~/models/SubscriptionModel';
-import type { FinancialServiceInterface } from '../models/FinancialServiceInterface';
+import type { FinancialServiceInterface } from '~/models/FinancialServiceInterface';
 
 export function subscriptionsService(): FinancialServiceInterface {
   async function getFinancial(
@@ -51,7 +51,7 @@ export function subscriptionsService(): FinancialServiceInterface {
     });
   }
 
-  function mapToSubModel(item: FinancialCommonModel): SubscriptionsModel {
+  function mapToSubModel(item: FinancialCommonModel) {
     return {
       name: item.text,
       cost: item.value,
@@ -73,8 +73,8 @@ export function subscriptionsService(): FinancialServiceInterface {
       anotherDate: item.nextBillingDate,
       frequency: item.frequency,
       status: item.status,
-      categoryId: item.categoryId,
-      currencyId: item.currencyId,
+      categoryId: item.category.id,
+      currencyId: item.currency.id,
     };
   }
 
