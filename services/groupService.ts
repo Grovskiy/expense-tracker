@@ -4,7 +4,6 @@ export function groupService() {
   const { setGroups } = useGroupsStore();
 
   async function getGroup() {
-
     await request('/api/Groups', {
       method: 'get',
     }).then(res => {

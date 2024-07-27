@@ -1,7 +1,7 @@
 import type { PaginatedCollectionResponse } from '~/models/PaginatedCollectionResponse';
 import type { IncomeModel } from '~/models/income/IncomeModel';
 import type { FinancialCommonModel } from '~/models/FinancialCommonModel';
-import type { FinancialServiceInterface } from '../models/FinancialServiceInterface';
+import type { FinancialServiceInterface } from '~/models/FinancialServiceInterface';
 import { FrequencyEnum } from '~/enums/FrequencyEnum';
 import { StatusSubEnum } from '~/enums/StatusSubEnum';
 

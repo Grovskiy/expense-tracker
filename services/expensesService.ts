@@ -1,6 +1,6 @@
 import type { ExpenseModel } from '~/models/expense/ExpenseModel';
 import type { PaginatedCollectionResponse } from '~/models/PaginatedCollectionResponse';
-import type { FinancialServiceInterface } from '../models/FinancialServiceInterface';
+import type { FinancialServiceInterface } from '~/models/FinancialServiceInterface';
 import type { FinancialCommonModel } from '~/models/FinancialCommonModel';
 import { FrequencyEnum } from '~/enums/FrequencyEnum';
 import { StatusSubEnum } from '~/enums/StatusSubEnum';

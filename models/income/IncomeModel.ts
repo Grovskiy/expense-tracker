@@ -5,9 +5,9 @@ export interface IncomeModel {
   taxAmount: number;
   date: string; // 2024-01-03T19:01:12.407Z
   category: {
-    id: string
+    id: string;
   };
   currency: {
-    id: string
+    id: string;
   };
 }
