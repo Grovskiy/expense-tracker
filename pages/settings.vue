@@ -12,7 +12,7 @@
   <UContainer>
     <UCard class="mb-4">
       <h2 class="mb-2 font-bold">Редагування категорій</h2>
-      <div class="flex">
+      <div class="flex flex-wrap">
         <CategoriesEdit
           class="mr-4"
           title="Витрати"

@@ -23,10 +23,6 @@
     currentCurrency: '',
   });
 
-  onMounted(() => {
-    if (state.currencyId) fetchData();
-  });
-
   watch(
     () => state.currencyId,
     (newValue, oldValue) => {

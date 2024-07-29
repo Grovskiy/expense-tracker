@@ -1,5 +1,5 @@
-import type { FrequencyEnum } from "~/enums/FrequencyEnum";
-import type { StatusSubEnum } from "~/enums/StatusSubEnum";
+import type { FrequencyEnum } from '~/enums/FrequencyEnum';
+import type { StatusSubEnum } from '~/enums/StatusSubEnum';
 
 export interface FinancialCommonModel {
   id: string | undefined;

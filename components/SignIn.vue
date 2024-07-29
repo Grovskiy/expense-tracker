@@ -4,8 +4,9 @@
   import { useAuthStore } from '~/store/auth';
   import { storeToRefs } from 'pinia';
   import type { IFetchError } from 'ofetch';
+  import { request } from '~/utils/request';
 
-  const { authSignIn } = useAuthStore();
+  const { handleRes  } = useAuthStore();
   const { authenticated } = storeToRefs(useAuthStore());
   const router = useRouter();
 
@@ -19,15 +20,25 @@
   type Schema = InferType<typeof schema>;
 
   const state = reactive({
-    email: 'test1@test.com', // undefined
-    password: 'test1@test.com', // undefined
+    email: undefined,
+    password: undefined,
   });
   const form = ref();
+  const isLoading = ref();
 
   // TODO: add loader
   async function onSubmit(event: FormSubmitEvent<Schema>) {
     try {
-      await authSignIn(event.data);
+      isLoading.value = true;
+
+      await request('/api/Authentication/sign-in', {
+        method: 'post',
+        body: event.data,
+      })
+        .then(res => handleRes(res))
+
+      if (authenticated.value) await router.push('/');
+      firstLogin();
     } catch (e) {
       const err = e as IFetchError['data'];
       if (err.status === 400) {
@@ -36,8 +47,9 @@
           { path: 'password', message: err.error },
         ]);
       }
+    } finally {
+      isLoading.value = false;
     }
-    if (authenticated) await router.push('/');
   }
 </script>
 
@@ -46,18 +58,22 @@
     ref="form"
     :schema="schema"
     :state="state"
-    class="space-y-4"
+    class="space-y-3"
     @submit="onSubmit"
   >
     <UFormGroup label="Email" name="email">
-      <UInput v-model="state.email" />
+      <UInput v-model="state.email" placeholder="someone@example.com" />
     </UFormGroup>
 
     <UFormGroup label="Password" name="password">
-      <UInput v-model="state.password" type="password" />
+      <UInput
+        v-model="state.password"
+        type="password"
+        placeholder="qwerty***"
+      />
     </UFormGroup>
 
-    <UButton block type="submit"> Sign in </UButton>
+    <UButton block type="submit" :loading="isLoading"> Sign in </UButton>
   </UForm>
 </template>
 

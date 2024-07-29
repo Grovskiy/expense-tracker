@@ -45,15 +45,14 @@ Build the application for production:
 ```bash
 # npm
 npm run build
+```
 
-# pnpm
-pnpm run build
+Build and deploy to Github Pages
 
-# yarn
-yarn build
+```bash
+npx nuxt build --preset github_pages
 
-# bun
-bun run build
+npm run deploy
 ```
 
 Locally preview production build:

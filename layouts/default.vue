@@ -1,4 +1,10 @@
-<script lang="ts" setup></script>
+<script lang="ts" setup>
+  import { firstLogin } from '~/utils/firstLogin';
+
+  onMounted(() => {
+    firstLogin();
+  });
+</script>
 <template>
   <div>
     <VHeader />

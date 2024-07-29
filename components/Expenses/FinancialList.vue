@@ -26,13 +26,15 @@
     page: number;
     totalItems: number;
     selectedLimitItems: string;
+    isLoading: boolean;
   }
 
   const state = reactive({
     financialArray: [],
     page: 1,
-    totalItems: 5,
+    totalItems: 1,
     selectedLimitItems: optionsLimitItems[2],
+    isLoading: false,
   } as unknown as StateInterface);
 
   const limitItems = computed<number>(() => {
@@ -79,18 +81,21 @@
   }
 
   async function createFinancial(payload: FinancialCommonModel) {
+    state.isLoading = true;
     await serviceFinancial
       .postFinancial(payload)
       .then(() => actionEnded('Створено'));
   }
 
   async function editFinancial(payload: FinancialCommonModel) {
+    state.isLoading = true;
     await serviceFinancial
       .changeFinancial(payload)
       .then(() => actionEnded('Змінено'));
   }
 
   async function removeFinancial(id: FinancialCommonModel['id']) {
+    state.isLoading = true;
     await serviceFinancial
       .deleteFinancial(id)
       .then(() => actionEnded('Видалено'));
@@ -122,6 +127,7 @@
     });
     updateDataTable();
     setIsOpenSideover(false, false);
+    state.isLoading = false;
   };
 
   const setIsOpenSideover = (value: boolean, isEdit: boolean) => {
@@ -139,23 +145,18 @@
 </script>
 
 <template>
-  <div class="flex flex-col max-w-sm mx-auto">
+  <div class="flex flex-col max-w-sm mx-auto pb-6">
     <div
       v-if="isIncomesMode || isExpensesMode"
       class="flex justify-between mt-4 mb-2"
     >
-      <DatePickerRange v-model="chosenDate" />
-      <UButton
-        @click="fetchData"
-        variant="outline"
-        icon="i-heroicons-arrow-path-rounded-square-solid"
-        class="ml-2"
-      />
+      <DatePickerRange v-model="chosenDate" @update:model-value="fetchData" />
       <UButton
         @click="setIsOpenSideover(true, false)"
         variant="outline"
         icon="i-heroicons-plus-circle"
         class="ml-auto"
+        label="Додати"
       />
     </div>
     <UButton
@@ -178,7 +179,7 @@
       class="even:bg-slate-50 dark:even:bg-slate-900"
     />
 
-    <div class="flex mt-4">
+    <div v-if="state.totalItems > limitItems" class="flex mt-4">
       <UPagination
         v-model="state.page"
         :page-count="limitItems"
@@ -206,6 +207,7 @@
         <FinancialAdd
           :edit-mode="isEditFinancialAction"
           :payload="stateSideOver"
+          :is-loading="state.isLoading"
           @edit-done="editFinancial"
           @create-done="createFinancial"
           @delete-done="removeFinancial(stateSideOver.id)"

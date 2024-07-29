@@ -8,7 +8,7 @@ export interface FinancialServiceInterface {
     dateFrom?: string,
     dateTo?: string,
   ): Promise<PaginatedCollectionResponse<FinancialCommonModel>>;
-  postFinancial(payload: FinancialCommonModel): void;
-  changeFinancial(payload: FinancialCommonModel): void;
-  deleteFinancial(id: FinancialCommonModel['id']): void;
+  postFinancial(payload: FinancialCommonModel): Promise<any>;
+  changeFinancial(payload: FinancialCommonModel): Promise<any>;
+  deleteFinancial(id: FinancialCommonModel['id']): Promise<any>;
 }

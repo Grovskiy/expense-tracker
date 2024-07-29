@@ -9,6 +9,6 @@ export interface SubscriptionsModel {
   nextBillingDate: string;
   frequency: FrequencyEnum;
   status: StatusSubEnum;
-  categoryId: string;
-  currencyId: string;
+  category: { id: string };
+  currency: { id: string };
 }

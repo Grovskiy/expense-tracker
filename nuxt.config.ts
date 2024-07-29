@@ -1,15 +1,21 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   ssr: false,
+  app: {
+    // baseURL: process.env.NODE_ENV === 'production' ? '' : '',
+    // buildAssetsDir: process.env.NODE_ENV === 'production' ? '' : '',
+    baseURL: process.env.NODE_ENV === 'production' ? '/expense-tracker/' : '',
+    buildAssetsDir: process.env.NODE_ENV === 'production' ? 'assets' : '',
+  },
   devtools: {
-    enabled: true,
+    enabled: process.env.NODE_ENV !== 'production',
 
     timeline: {
-      enabled: true,
+      enabled: process.env.NODE_ENV !== 'production',
     },
   },
   routeRules: {
-    '/api/**': { proxy: { to: `${process.env.NUXT_BACKEND_URL}/api/**` } }
+    '/api/**': { proxy: { to: `${process.env.NUXT_BACKEND_URL}/api/**` } },
   },
   modules: [
     '@pinia/nuxt',
@@ -27,11 +33,3 @@ export default defineNuxtConfig({
     },
   },
 });
-
-// # $config.public.baseUrl in templates
-// # or  | const runtimeConfig = useRuntimeConfig();
-// # and | runtimeConfig.public.baseUrl
-
-// rules: {
-//   'vue/block-order': ['error', { order: ['script', 'template', 'style'] }],
-// }

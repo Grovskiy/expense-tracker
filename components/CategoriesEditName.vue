@@ -1,7 +1,9 @@
 <script setup lang="ts">
   import type { CategoryFamilyInterface } from '~/interfaces/CategoryFamilyInterface';
   import { useCategoriesStore } from '~/store/categories';
-  const { putCategories, deleteCategories } = useCategoriesStore();
+  import { request } from '~/utils/request';
+  import { categoriesService } from '~/services/categoriesService';
+  const { handlerErr } = useCategoriesStore();
 
   const props = defineProps<{
     category: CategoryFamilyInterface;
@@ -11,14 +13,27 @@
     shownInput: false,
   });
 
-  function handlerButton() {
+  async function handlerButton() {
     if (state.newName.length) {
-      putCategories(props.category.id, state.newName);
+      await request(`/api/Categories/${props.category.id}`, {
+        method: 'put',
+        body: {
+          name: state.newName,
+        },
+      })
+        .then(() => categoriesService().handlerThenCategory('Назву змінено'))
+        .catch(err => handlerErr(err));
+
       state.shownInput = false;
     }
   }
-  function handlerDelete() {
-    deleteCategories(props.category.id);
+  async function handlerDelete() {
+    await request(`/api/Categories/${props.category.id}`, {
+      method: 'delete',
+      body: {},
+    })
+      .then(() => categoriesService().handlerThenCategory('Категорію видалено'))
+      .catch(err => handlerErr(err));
   }
 </script>
 
