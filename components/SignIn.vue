@@ -4,8 +4,9 @@
   import { useAuthStore } from '~/store/auth';
   import { storeToRefs } from 'pinia';
   import type { IFetchError } from 'ofetch';
+  import { request } from '~/utils/request';
 
-  const { authSignIn } = useAuthStore();
+  const { handleRes  } = useAuthStore();
   const { authenticated } = storeToRefs(useAuthStore());
   const router = useRouter();
 
@@ -29,7 +30,13 @@
   async function onSubmit(event: FormSubmitEvent<Schema>) {
     try {
       isLoading.value = true;
-      await authSignIn(event.data);
+
+      await request('/api/Authentication/sign-in', {
+        method: 'post',
+        body: event.data,
+      })
+        .then(res => handleRes(res))
+
       if (authenticated.value) await router.push('/');
       firstLogin();
     } catch (e) {

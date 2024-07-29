@@ -7,11 +7,12 @@
   import { type InferType, object, string } from 'yup';
   import CategoriesDefaultList from '~/components/CategoriesDefaultList.vue';
   import { useCategoriesStore } from '~/store/categories';
+  import { request } from '~/utils/request';
 
   const categoriesStore = useCategoriesStore();
-  const { getDefaultCategories } = categoriesStore;
+  const { setDefaultsCategories } = categoriesStore;
 
-  const { authSignUp } = useAuthStore();
+  const { handleRes } = useAuthStore();
   const { authenticated } = storeToRefs(useAuthStore());
   const router = useRouter();
 
@@ -39,13 +40,19 @@
   async function onSubmit(event: FormSubmitEvent<Schema>) {
     try {
       isLoading.value = true;
-      await authSignUp(event.data);
+
+      await request('/api/Authentication/sign-up', {
+        method: 'post',
+        body: event.data,
+      })
+        .then(res => handleRes(res))
+
       firstLogin();
       if (authenticated.value) await router.push('/');
     } catch (e) {
       if (e && typeof e === 'object') {
         const err = e as IFetchError['data'];
-        if (err.status === 400) {
+        if (err.status === 400 || err.status === 422) {
           form.value.setErrors(
             err.errors.map((item: ErrorsValidationInterface): FormError => {
               return { path: item.field.toLowerCase(), message: item.message };
@@ -58,8 +65,14 @@
     }
   }
 
+  async function getAndSetDefaultCategories() {
+    await request('/api/Categories/default-expense-categories', {
+      method: 'get',
+    }).then(res => setDefaultsCategories(res));
+  }
+
   onMounted(() => {
-    getDefaultCategories();
+    getAndSetDefaultCategories();
   });
 </script>
 

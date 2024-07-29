@@ -32,7 +32,7 @@
   const state = reactive({
     financialArray: [],
     page: 1,
-    totalItems: 5,
+    totalItems: 1,
     selectedLimitItems: optionsLimitItems[2],
     isLoading: false,
   } as unknown as StateInterface);
@@ -145,7 +145,7 @@
 </script>
 
 <template>
-  <div class="flex flex-col max-w-sm mx-auto">
+  <div class="flex flex-col max-w-sm mx-auto pb-6">
     <div
       v-if="isIncomesMode || isExpensesMode"
       class="flex justify-between mt-4 mb-2"
@@ -179,7 +179,7 @@
       class="even:bg-slate-50 dark:even:bg-slate-900"
     />
 
-    <div class="flex mt-4">
+    <div v-if="state.totalItems > limitItems" class="flex mt-4">
       <UPagination
         v-model="state.page"
         :page-count="limitItems"

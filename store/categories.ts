@@ -34,23 +34,11 @@ export const useCategoriesStore = defineStore('categories', {
       ) as CategoryFamilyInterface[],
   },
   actions: {
-    async getDefaultCategories() {
-      if (this.defaultLoaded) return;
-      await $fetch('/api/Categories/default-expense-categories', {
-        method: 'get',
-      }).then(res => {
+    setDefaultsCategories(res: object | unknown) {
+      if (res && typeof res === 'object') {
         this.defaultCategories = res as CategoryDefaultInterface[];
         this.defaultLoaded = true;
-      });
-    },
-    async getFamilyCategories() {
-      if (this.familyLoaded) return;
-      await $fetch('/api/Categories/get-family-categories', {
-        method: 'get',
-      }).then(res => {
-        this.familyCategories = res as CategoryFamilyInterface[];
-        this.familyLoaded = true;
-      });
+      }
     },
     setFamilyCategories(array: CategoryFamilyInterface[]) {
       this.familyCategories = array;
