@@ -22,7 +22,7 @@
         "eslint-config-prettier": "^9.1.0",
         "eslint-plugin-vue": "^9.19.2",
         "gh-pages": "^6.1.1",
-        "nuxt": "^3.8.2",
+        "nuxt": "^3.12.4",
         "nuxt-typed-router": "^3.5.0",
         "prettier": "3.1.1",
         "vue": "^3.3.10",
