@@ -54,8 +54,8 @@ export const request = async <T>(
     if (error.response?.status === 401 && useCookie('tokenRefresh').value) {
       const response = await fetcher.raw(request, options);
       return response._data as T;
+    } else {
+      throw error.response?._data;
     }
-
-    return error.response?._data as T;
   }
 };

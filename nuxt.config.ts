@@ -23,6 +23,7 @@ export default defineNuxtConfig({
     'nuxt-typed-router',
     ['@nuxtjs/eslint-module', { emitWarning: true }],
     'dayjs-nuxt',
+    "@nuxtjs/storybook"
   ],
   runtimeConfig: {
     public: {
