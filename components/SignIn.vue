@@ -26,17 +26,16 @@
   const form = ref();
   const isLoading = ref();
 
-  // TODO: add loader
   async function onSubmit(event: FormSubmitEvent<Schema>) {
     try {
       isLoading.value = true;
 
-      await request('/api/Authentication/sign-in', {
+      const response = await request('/api/Authentication/sign-in', {
         method: 'post',
         body: event.data,
       })
-        .then(res => handleRes(res))
 
+      handleRes(response)
       if (authenticated.value) await router.push('/');
       firstLogin();
     } catch (e) {
@@ -46,6 +45,13 @@
           { path: 'email', message: err.error },
           { path: 'password', message: err.error },
         ]);
+      } else {
+        useToast().add({
+          title: `Error ${err.status || err.statusCode}`,
+          description: err.message || 'Something wrong',
+          timeout: 6000,
+          color: 'rose',
+        });
       }
     } finally {
       isLoading.value = false;

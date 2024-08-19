@@ -19,7 +19,7 @@
           Don’t have an account?
           <button
             @click="setIsSignUp(true)"
-            class="text-yellow-500 hover:text-yellow-700"
+            class="text-yellow-500 hover:text-yellow-700 js-sign-in"
           >
             Sign up
           </button>
