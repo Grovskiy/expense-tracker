@@ -1,12 +1,14 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   ssr: false,
+
   app: {
     // baseURL: process.env.NODE_ENV === 'production' ? '' : '',
     // buildAssetsDir: process.env.NODE_ENV === 'production' ? '' : '',
     baseURL: process.env.NODE_ENV === 'production' ? '/expense-tracker/' : '',
     buildAssetsDir: process.env.NODE_ENV === 'production' ? 'assets' : '',
   },
+
   devtools: {
     enabled: process.env.NODE_ENV !== 'production',
 
@@ -14,17 +16,19 @@ export default defineNuxtConfig({
       enabled: process.env.NODE_ENV !== 'production',
     },
   },
+
   routeRules: {
     '/api/**': { proxy: { to: `${process.env.NUXT_BACKEND_URL}/api/**` } },
   },
+
   modules: [
     '@pinia/nuxt',
     '@nuxt/ui',
     'nuxt-typed-router',
     ['@nuxtjs/eslint-module', { emitWarning: true }],
     'dayjs-nuxt',
-    "@nuxtjs/storybook"
   ],
+
   runtimeConfig: {
     public: {
       backendUrl: process.env.NUXT_BACKEND_URL,
@@ -33,4 +37,6 @@ export default defineNuxtConfig({
       myValue: process.env.NUXT_PUBLIC_MY_VALUE,
     },
   },
+
+  compatibilityDate: '2024-08-19',
 });
